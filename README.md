@@ -1,5 +1,4 @@
-## Hi there 👋
-
+## whats upp bitchessss why u spyin on me
 <!--
 **realrealtahger-debug/realrealtahger-debug** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
