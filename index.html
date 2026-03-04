@@ -83,8 +83,6 @@
   .card-icon { font-size:24px; margin-bottom:10px; }
   .card-title { font-family:'DM Serif Display',serif; font-size:15px; color:var(--text); margin-bottom:6px; }
   .card-desc { font-size:12px; color:var(--muted); line-height:1.6; }
-  .edit-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; background:transparent; border:1px dashed var(--border); color:var(--muted); font-size:11px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all .2s; margin-bottom:20px; font-family:'DM Sans',sans-serif; }
-  .edit-btn:hover { border-color:var(--accent); color:var(--accent); }
 
   /* COMMENTS */
   .comments-list { display:flex; flex-direction:column; gap:14px; margin-bottom:30px; }
@@ -146,23 +144,9 @@
   footer { padding:30px 80px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--muted); letter-spacing:1px; }
   footer span { color:var(--accent); }
 
-  /* MODAL */
-  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(8px); z-index:200; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
-  .modal-overlay.open { opacity:1; pointer-events:all; }
-  .modal { background:var(--surface); border:1px solid var(--border); padding:36px; width:560px; max-width:94vw; max-height:90vh; overflow-y:auto; transform:translateY(20px); transition:transform .25s; }
-  .modal-overlay.open .modal { transform:translateY(0); }
-  .modal-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; color:var(--text); margin-bottom:20px; }
-  .modal-field { margin-bottom:16px; }
-  .modal-label { display:block; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
-  .modal-input,.modal-textarea { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px 14px; font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:border-color .2s; }
-  .modal-input:focus,.modal-textarea:focus { border-color:var(--accent); }
-  .modal-textarea { resize:vertical; min-height:100px; }
-  .modal-actions { display:flex; gap:12px; margin-top:24px; }
-
   /* TOAST */
   .toast { position:fixed; bottom:30px; right:30px; background:var(--accent); color:var(--bg); padding:12px 22px; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500; z-index:300; transform:translateY(80px); opacity:0; transition:all .3s; font-family:'DM Sans',sans-serif; }
   .toast.show { transform:translateY(0); opacity:1; }
-
   .loading { display:inline-block; width:12px; height:12px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; }
   @keyframes spin { to{transform:rotate(360deg)} }
   .empty-state { font-size:13px; color:var(--muted); padding:10px 0; }
@@ -201,8 +185,8 @@
 <aside id="sidebar">
   <div class="sidebar-section">
     <div class="sidebar-label">Profile</div>
-    <div class="sidebar-avatar" id="sidebar-initials">Y</div>
-    <div class="sidebar-name" id="sidebar-display-name">Your Name</div>
+    <div class="sidebar-avatar">Y</div>
+    <div class="sidebar-name">Your Name</div>
     <div class="sidebar-handle">@handle</div>
   </div>
   <ul class="sidebar-nav">
@@ -227,11 +211,10 @@
     <div class="hero-bg"></div>
     <div class="hero-line"></div>
     <div class="hero-eyebrow">✦ Welcome to my corner of the internet</div>
-    <h1 class="hero-name" id="hero-name">YOUR<br><span>NAME</span></h1>
-    <p class="hero-title" id="hero-title">Designer · Developer · Human</p>
-    <p class="hero-bio" id="hero-bio">I make things on the internet. Sometimes they're good. I drink too much coffee, argue about fonts, and genuinely believe good design can change how people feel about the world.</p>
+    <h1 class="hero-name">YOUR<br><span>NAME</span></h1>
+    <p class="hero-title">Designer · Developer · Human</p>
+    <p class="hero-bio">honestly!!! i just make random stuff a lot, most of the time its not even me, but atleast its functional i guess? im not proud of it but at least it works O_O</p>
     <div class="hero-cta">
-      <button class="btn-primary" onclick="openEditModal()">✎ Edit Page</button>
       <button class="btn-ghost" onclick="document.getElementById('vote').scrollIntoView({behavior:'smooth'})">Am I Cooked? →</button>
     </div>
     <div class="hero-scroll"><div class="scroll-line"></div> Scroll down</div>
@@ -240,18 +223,17 @@
   <section id="about" class="section">
     <div class="section-label">§ 01 — About</div>
     <h2 class="section-title">A BIT ABOUT ME</h2>
-    <button class="edit-btn" onclick="openEditModal()">✎ Edit Content</button>
     <div class="about-grid">
       <div class="about-text">
-        <p id="about-p1">I'm a creative who exists somewhere between the technical and the beautiful. I've been building for the web since I could barely spell HTML, and somewhere along the way it became the thing I love most.</p>
-        <p id="about-p2">When I'm not staring at a screen, you'll find me hunting for the best coffee in town, reading design books I'll never finish, or rewatching the same shows on repeat.</p>
-        <p id="about-p3">I believe the internet should be a more interesting place. That's why I'm here.</p>
+        <p>im pretty dang uncreative dude, and like, i only know how to code in luau, you know this website you're reading off? i only made the interface and i make ai put the functionality in it....</p>
+        <p>im not proud of it... but it works i guess?????????/ i already said this but oh well,, its true i guess cuz like i actually have potential but im too fkn lazy to actually reach my full potential, megumi in a nutshell.</p>
+        <p>i look forward to being friends with you all!!! love love!!</p>
       </div>
       <div class="about-cards">
-        <div class="about-card"><div class="card-icon">🎨</div><div class="card-title">Design</div><div class="card-desc">Visual systems, UI, and obsessing over kerning at 2am.</div></div>
-        <div class="about-card"><div class="card-icon">⚡</div><div class="card-title">Code</div><div class="card-desc">Frontend, full-stack, whatever it takes to ship.</div></div>
-        <div class="about-card"><div class="card-icon">☕</div><div class="card-title">Coffee</div><div class="card-desc">A deeply serious hobby disguised as a caffeine addiction.</div></div>
-        <div class="about-card"><div class="card-icon">🌙</div><div class="card-title">Chaos</div><div class="card-desc">Night owl energy. Best ideas after midnight.</div></div>
+        <div class="about-card"><div class="card-icon">🎨</div><div class="card-title">Design</div><div class="card-desc">visual design and ui/ux is pretty good</div></div>
+        <div class="about-card"><div class="card-icon">⚡</div><div class="card-title">Code</div><div class="card-desc">luau/lua exclusive to python yes yes yummers</div></div>
+        <div class="about-card"><div class="card-icon">☕</div><div class="card-title">Coffee</div><div class="card-desc">coffe tastes terrible!!! i like tea better!</div></div>
+        <div class="about-card"><div class="card-icon">🌙</div><div class="card-title">Chaos</div><div class="card-desc">deep sleeper. mrrp meow</div></div>
       </div>
     </div>
   </section>
@@ -299,7 +281,7 @@
             </select>
             <input class="field-input" id="note-name" placeholder="Your name..." maxlength="40" style="flex:1;min-width:140px;">
           </div>
-          <textarea class="field-textarea" id="note-text" placeholder="Drop your take here..." style="margin-top:10px;min-height:70px;"></textarea>
+          <textarea class="field-textarea" id="note-text" placeholder="Drop your take here..." style="margin-top:0;min-height:70px;"></textarea>
           <button class="btn-primary" onclick="submitNote()" style="font-size:11px;padding:10px 22px;">Submit Note</button>
         </div>
       </div>
@@ -307,26 +289,10 @@
   </section>
 
   <footer>
-    <div>Made with love (and existential dread) — <span id="footer-name">Your Name</span></div>
+    <div>Made with love (and existential dread) — <span>Your Name</span></div>
     <div id="footer-time"></div>
   </footer>
 </main>
-
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
-    <div class="modal-title">EDIT PAGE</div>
-    <div class="modal-field"><label class="modal-label">Display Name</label><input class="modal-input" id="edit-name"></div>
-    <div class="modal-field"><label class="modal-label">Title / Tagline</label><input class="modal-input" id="edit-title"></div>
-    <div class="modal-field"><label class="modal-label">Hero Bio</label><textarea class="modal-textarea" id="edit-bio" style="min-height:80px;"></textarea></div>
-    <div class="modal-field"><label class="modal-label">About Paragraph 1</label><textarea class="modal-textarea" id="edit-p1"></textarea></div>
-    <div class="modal-field"><label class="modal-label">About Paragraph 2</label><textarea class="modal-textarea" id="edit-p2"></textarea></div>
-    <div class="modal-field"><label class="modal-label">About Paragraph 3</label><textarea class="modal-textarea" id="edit-p3"></textarea></div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="saveEdits()">Save Changes</button>
-      <button class="btn-ghost" onclick="closeEditModal()">Cancel</button>
-    </div>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -337,7 +303,6 @@ const sb = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ha3Rkb2VncWN3cmltdnJtcGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MjA2NjEsImV4cCI6MjA4ODE5NjY2MX0._ePeRzkrfyxiJHs7M1YvpXgI-9aWhw_f6TFxWTpWvqc'
 );
 
-// Unique voter ID stored in localStorage so votes persist per browser
 let voterId = localStorage.getItem('voter_id');
 if (!voterId) {
   voterId = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -345,7 +310,6 @@ if (!voterId) {
 }
 let myVote = null;
 
-// ── UTILS ──
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -372,7 +336,7 @@ function avatarGrad(n) {
 let comments = [];
 async function loadComments() {
   const { data, error } = await sb.from('comments').select('*').order('created_at',{ascending:true});
-  if (error) { console.error('comments:', error); return; }
+  if (error) { console.error(error); return; }
   comments = data || [];
   renderComments();
 }
@@ -426,7 +390,6 @@ async function saveComment(id) {
   if (error) return toast('Error saving');
   toast('Updated ✦');
 }
-
 sb.channel('rt-comments')
   .on('postgres_changes',{event:'*',schema:'public',table:'comments'}, loadComments)
   .subscribe();
@@ -464,7 +427,6 @@ function renderVotes() {
   document.getElementById('vote-yes-btn').classList.toggle('selected', myVote === 'yes');
   document.getElementById('vote-no-btn').classList.toggle('selected', myVote === 'no');
 }
-
 sb.channel('rt-votes')
   .on('postgres_changes',{event:'*',schema:'public',table:'votes'}, loadVotes)
   .subscribe();
@@ -473,7 +435,7 @@ sb.channel('rt-votes')
 let notes = [];
 async function loadNotes() {
   const { data, error } = await sb.from('vote_notes').select('*').order('created_at',{ascending:false});
-  if (error) { console.error('notes:', error); return; }
+  if (error) { console.error(error); return; }
   notes = data || [];
   renderNotes();
 }
@@ -506,37 +468,9 @@ async function deleteNote(id) {
   await sb.from('vote_notes').delete().eq('id', id);
   toast('Note removed');
 }
-
 sb.channel('rt-notes')
   .on('postgres_changes',{event:'*',schema:'public',table:'vote_notes'}, loadNotes)
   .subscribe();
-
-// ── EDIT MODAL ──
-function openEditModal() {
-  document.getElementById('edit-name').value = document.getElementById('sidebar-display-name').textContent;
-  document.getElementById('edit-title').value = document.getElementById('hero-title').textContent;
-  document.getElementById('edit-bio').value = document.getElementById('hero-bio').textContent.trim();
-  document.getElementById('edit-p1').value = document.getElementById('about-p1').textContent;
-  document.getElementById('edit-p2').value = document.getElementById('about-p2').textContent;
-  document.getElementById('edit-p3').value = document.getElementById('about-p3').textContent;
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeEditModal() { document.getElementById('modal-overlay').classList.remove('open'); }
-function saveEdits() {
-  const name = document.getElementById('edit-name').value.trim() || 'Your Name';
-  const parts = name.split(' ');
-  document.getElementById('hero-name').innerHTML = `${parts[0].toUpperCase()}<br><span>${parts.slice(1).join(' ').toUpperCase()||'NAME'}</span>`;
-  document.getElementById('hero-title').textContent = document.getElementById('edit-title').value.trim();
-  document.getElementById('hero-bio').textContent = document.getElementById('edit-bio').value.trim();
-  document.getElementById('about-p1').textContent = document.getElementById('edit-p1').value.trim();
-  document.getElementById('about-p2').textContent = document.getElementById('edit-p2').value.trim();
-  document.getElementById('about-p3').textContent = document.getElementById('edit-p3').value.trim();
-  document.getElementById('sidebar-display-name').textContent = name;
-  document.getElementById('sidebar-initials').textContent = initials(name);
-  document.getElementById('footer-name').textContent = name;
-  closeEditModal(); toast('Page updated ✦');
-}
-document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id==='modal-overlay') closeEditModal(); });
 
 // sidebar scroll spy
 window.addEventListener('scroll', () => {
@@ -551,7 +485,6 @@ window.addEventListener('scroll', () => {
 document.getElementById('footer-time').textContent =
   new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 
-// BOOT
 loadComments();
 loadVotes();
 loadNotes();
