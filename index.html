@@ -42,7 +42,6 @@
             border-radius: 22px;
             transition: transform 0.2s ease;
         }
-        .apple-widget:hover { transform: scale(1.01); }
 
         /* iOS style inputs */
         .apple-input {
@@ -73,6 +72,8 @@
             transition: all 0.2s;
         }
         .apple-btn:active { transform: scale(0.96); opacity: 0.8; }
+        
+        .apple-btn-red { background: var(--apple-red); }
 
         /* iOS Segmented Control for Voting */
         .segmented-control {
@@ -84,21 +85,21 @@
         .segment {
             flex: 1;
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             border-radius: 12px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s;
         }
         .segment.selected-cooked { background: var(--apple-red); color: white; box-shadow: 0 2px 8px rgba(255, 69, 58, 0.4); }
         .segment.selected-uncooked { background: var(--apple-blue); color: white; box-shadow: 0 2px 8px rgba(10, 132, 255, 0.4); }
 
         /* Live Bar */
-        .live-bar-container { height: 14px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; display: flex; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        .live-bar-container { height: 16px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; display: flex; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
         .bar-cooked { background: linear-gradient(90deg, #ff3b30, #ff453a); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .bar-uncooked { background: linear-gradient(90deg, #007aff, #0a84ff); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Hidden Scrollbar for Feed */
+        /* Hidden Scrollbar */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -106,10 +107,19 @@
         .section-title { font-weight: 700; letter-spacing: -0.02em; color: rgba(255,255,255,0.9); }
     </style>
 </head>
-<body class="p-6 md:p-12 antialiased">
+<body class="p-6 md:p-12 antialiased relative">
+
+    <!-- Top Navigation / User Profile -->
+    <div id="userNav" class="hidden absolute top-6 right-6 md:top-8 md:right-12 flex items-center gap-4 bg-white/5 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md">
+        <div class="text-sm">
+            <span class="text-gray-400">Logged in as:</span>
+            <span id="navUserName" class="font-bold text-white ml-1"></span>
+        </div>
+        <button id="logoutBtn" class="text-xs font-bold text-red-400 hover:text-red-300 transition uppercase tracking-wider">Log Out</button>
+    </div>
 
     <!-- Hero Section -->
-    <header class="max-w-4xl mx-auto text-center mt-8 mb-16">
+    <header class="max-w-4xl mx-auto text-center mt-12 mb-16">
         <h1 class="hero-title text-5xl md:text-7xl mb-2 text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500">
             Saweedas Khanteetaow
         </h1>
@@ -130,17 +140,17 @@
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="apple-widget p-6">
+            <div class="apple-widget p-6 hover:scale-105 transition-transform">
                 <div class="text-3xl mb-4">🎨</div>
                 <h3 class="font-bold text-lg mb-2">Visual Design</h3>
                 <p class="text-gray-400 text-sm">UI/UX is pretty good fr</p>
             </div>
-            <div class="apple-widget p-6">
+            <div class="apple-widget p-6 hover:scale-105 transition-transform">
                 <div class="text-3xl mb-4">⚡</div>
                 <h3 class="font-bold text-lg mb-2">Luau/Lua</h3>
                 <p class="text-gray-400 text-sm">Exclusive to Python yes yummers</p>
             </div>
-            <div class="apple-widget p-6">
+            <div class="apple-widget p-6 hover:scale-105 transition-transform">
                 <div class="text-3xl mb-4">🌙</div>
                 <h3 class="font-bold text-lg mb-2">Deep Sleeper</h3>
                 <p class="text-gray-400 text-sm">mrrp meow</p>
@@ -148,68 +158,70 @@
         </div>
     </section>
 
-    <!-- Interactive Sections -->
     <section class="max-w-4xl mx-auto space-y-8 mb-20">
         
-        <!-- CARD 1: Input Section -->
-        <div class="apple-glass p-8">
-            <h2 class="section-title text-2xl mb-6">Leave your thoughts</h2>
-            <div class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="displayName" placeholder="Display Name (e.g. GeometryDasher)" class="apple-input">
-                    <div class="segmented-control" id="voteControl">
-                        <div class="segment" data-vote="cooked">Cooked</div>
-                        <div class="segment" data-vote="not_cooked">Not Cooked</div>
-                    </div>
-                </div>
-                <textarea id="commentText" placeholder="Write something..." rows="3" class="apple-input resize-none"></textarea>
-                <div class="flex justify-end">
-                    <button id="postBtn" class="apple-btn">Post Comment</button>
-                </div>
+        <!-- CARD 1: The Fused Voting Section -->
+        <div class="apple-glass p-8 border-t-4 border-t-blue-500">
+            <h2 class="section-title text-2xl mb-2">Cast Your Verdict</h2>
+            <p class="text-sm text-gray-400 mb-6">Your vote is locked to your account. You can change it at any time.</p>
+            
+            <div class="segmented-control mb-6" id="voteControl">
+                <div class="segment" data-vote="cooked">Cooked</div>
+                <div class="segment" data-vote="not_cooked">Not Cooked</div>
             </div>
+            
+            <div class="flex justify-end">
+                <button id="submitVoteBtn" class="apple-btn w-full md:w-auto">Lock in Vote</button>
+            </div>
+
+            <hr class="border-gray-700/50 my-8">
+
+            <!-- Overall Verdict (Live Bar) -->
+            <h2 class="section-title text-xl mb-4">Overall Verdict</h2>
+            <div class="flex justify-between text-sm font-semibold mb-3">
+                <span class="text-red-400">Cooked (<span id="cookedCount">0</span>%)</span>
+                <span class="text-blue-400">Not Cooked (<span id="uncookedCount">0</span>%)</span>
+            </div>
+            <div class="live-bar-container">
+                <div id="barCooked" class="bar-cooked" style="width: 50%"></div>
+                <div id="barUncooked" class="bar-uncooked" style="width: 50%"></div>
+            </div>
+            <p class="text-center text-xs text-gray-500 mt-4 font-medium" id="totalVotesText">0 Total Votes Cast</p>
         </div>
 
-        <!-- CARD 2: Comments Feed (Scrollable) -->
-        <div>
-            <h2 class="section-title text-xl mb-4 ml-2">Community Feed</h2>
+        <!-- CARD 2: Separate Comment System -->
+        <div class="apple-glass p-8">
+            <h2 class="section-title text-2xl mb-6">Leave a Comment</h2>
+            <div class="space-y-4 mb-8">
+                <textarea id="commentText" placeholder="Write your thoughts here... no vote required." rows="3" class="apple-input resize-none"></textarea>
+                <div class="flex justify-end">
+                    <button id="postCommentBtn" class="apple-btn">Post Comment</button>
+                </div>
+            </div>
+
+            <!-- Scrollable Community Feed -->
+            <h2 class="section-title text-xl mb-4">Community Feed</h2>
             <div id="commentsFeed" class="space-y-4 max-h-[500px] overflow-y-auto hide-scrollbar pb-4 px-1">
                 <!-- Comments load here -->
             </div>
         </div>
 
-        <!-- CARD 3: Overall Verdict (Live Bar) -->
-        <div class="apple-glass p-8">
-            <h2 class="section-title text-2xl mb-8">Overall Verdict</h2>
-            <div>
-                <div class="flex justify-between text-sm font-semibold mb-3">
-                    <span class="text-red-400">Cooked (<span id="cookedCount">0</span>%)</span>
-                    <span class="text-blue-400">Not Cooked (<span id="uncookedCount">0</span>%)</span>
-                </div>
-                <div class="live-bar-container">
-                    <div id="barCooked" class="bar-cooked" style="width: 50%"></div>
-                    <div id="barUncooked" class="bar-uncooked" style="width: 50%"></div>
-                </div>
-                <p class="text-center text-xs text-gray-500 mt-4 font-medium" id="totalVotesText">0 Total Votes Cast</p>
-            </div>
-        </div>
-
     </section>
 
-    <!-- macOS Style Auth Modal -->
-    <div id="authModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div class="apple-glass p-8 w-full max-w-sm text-center">
-            <h3 class="text-xl font-bold mb-2">Authentication</h3>
-            <p class="text-xs text-gray-400 mb-6">Enter a User Code (min 3 chars). If it's your first time, choose a password to lock it.</p>
+    <!-- macOS Style Auth Modal (Forced on visit) -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl">
+        <div class="apple-glass p-8 w-full max-w-sm text-center transform scale-100 transition-all">
+            <h3 class="text-2xl font-bold mb-2 tracking-tight">Welcome</h3>
+            <p class="text-sm text-gray-400 mb-6">Create an account or log back in to continue.</p>
             
-            <div class="space-y-4 mb-6 text-left">
-                <input type="text" id="userCode" placeholder="User Code (e.g. ope)" class="apple-input">
-                <input type="password" id="userPass" placeholder="Password" class="apple-input">
+            <div class="space-y-4 mb-8 text-left">
+                <input type="text" id="authCode" placeholder="User Code (min 3 chars)" class="apple-input">
+                <input type="text" id="authName" placeholder="Display Name (e.g. GeometryDasher)" class="apple-input">
+                <input type="password" id="authPass" placeholder="Password" class="apple-input">
             </div>
             
-            <div class="flex gap-3 justify-end">
-                <button id="cancelAuth" class="px-4 py-2 rounded-full text-sm text-gray-400 hover:text-white transition">Cancel</button>
-                <button id="confirmAuth" class="apple-btn">Confirm</button>
-            </div>
+            <button id="confirmAuth" class="apple-btn w-full text-lg py-3">Enter Site</button>
+            <p class="text-xs text-gray-500 mt-4">Your session will be saved automatically.</p>
         </div>
     </div>
 
@@ -218,7 +230,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // YOUR FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyD6ciclM7NFpDx-J4YYyirGmFr9lddsJFw",
             authDomain: "castavote.firebaseapp.com",
@@ -229,13 +240,90 @@
             measurementId: "G-69JPN6ZYC0"
         };
 
-        let db;
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-        } catch(e) {
-            console.error("Firebase Initialization Error:", e);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- STATE & AUTH ---
+        let currentUser = JSON.parse(localStorage.getItem('castavote_session'));
+        let selectedVote = null;
+
+        const authModal = document.getElementById('authModal');
+        const userNav = document.getElementById('userNav');
+        const navUserName = document.getElementById('navUserName');
+        const voteSegments = document.querySelectorAll('.segment');
+
+        // Check login on visit
+        function checkAuth() {
+            if (currentUser) {
+                authModal.classList.add('hidden');
+                userNav.classList.remove('hidden');
+                userNav.classList.add('flex');
+                navUserName.innerText = `${currentUser.displayName} (${currentUser.userCode})`;
+                
+                // Show star if sug
+                if(currentUser.userCode.toLowerCase() === 'sug') {
+                    navUserName.innerHTML += ' <span class="text-yellow-400">⭐</span>';
+                }
+            } else {
+                authModal.classList.remove('hidden');
+                authModal.classList.add('flex');
+                userNav.classList.add('hidden');
+                userNav.classList.remove('flex');
+            }
         }
+        checkAuth();
+
+        // Login / Signup Function
+        document.getElementById('confirmAuth').addEventListener('click', async () => {
+            const uCode = document.getElementById('authCode').value.trim();
+            const uName = document.getElementById('authName').value.trim();
+            const uPass = document.getElementById('authPass').value.trim();
+
+            if (uCode.length < 3) return alert("User code must be at least 3 characters!");
+            if (!uName) return alert("Please enter a Display Name!");
+            if (!uPass) return alert("Password is required!");
+
+            // SUG protection 
+            if (uCode.toLowerCase() === 'sug' && uPass !== 'megumi') { 
+                return alert("Incorrect password for reserved user 'sug'.");
+            }
+
+            try {
+                const userRef = doc(db, "users", uCode.toLowerCase());
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    // Logging in
+                    if (userSnap.data().password !== uPass) {
+                        return alert("Wrong password for this User Code!");
+                    }
+                    // Update display name if they changed it
+                    await setDoc(userRef, { password: uPass, displayName: uName }, { merge: true });
+                } else {
+                    // Creating account
+                    await setDoc(userRef, { password: uPass, displayName: uName });
+                }
+
+                // Save session
+                currentUser = { userCode: uCode, displayName: uName };
+                localStorage.setItem('castavote_session', JSON.stringify(currentUser));
+                
+                // Clear inputs & hide modal
+                document.getElementById('authPass').value = '';
+                checkAuth();
+
+            } catch(e) {
+                console.error(e);
+                alert("Error connecting to database.");
+            }
+        });
+
+        // Logout Function
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('castavote_session');
+            currentUser = null;
+            checkAuth();
+        });
 
         // --- HWID & DEVICE GENERATOR ---
         function getDeviceAndHWID() {
@@ -246,159 +334,121 @@
             else if (/Android/.test(ua)) device = "Android";
             else if (/Windows/.test(ua)) device = "Windows";
 
-            let hwid = localStorage.getItem('sug_hwid');
+            let hwid = localStorage.getItem('castavote_hwid');
             if (!hwid) {
                 hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-                localStorage.setItem('sug_hwid', hwid);
+                localStorage.setItem('castavote_hwid', hwid);
             }
             return { device, hwid };
         }
 
-        let currentVote = null;
-
-        const voteSegments = document.querySelectorAll('.segment');
-        const postBtn = document.getElementById('postBtn');
-        const authModal = document.getElementById('authModal');
-        const cancelAuth = document.getElementById('cancelAuth');
-        const confirmAuth = document.getElementById('confirmAuth');
-        
-        // --- UI LOGIC ---
+        // --- VOTING SYSTEM (Fused Card) ---
         voteSegments.forEach(seg => {
             seg.addEventListener('click', () => {
                 voteSegments.forEach(s => s.className = 'segment');
                 if (seg.dataset.vote === 'cooked') {
                     seg.classList.add('selected-cooked');
-                    currentVote = 'Cooked';
+                    selectedVote = 'Cooked';
                 } else {
                     seg.classList.add('selected-uncooked');
-                    currentVote = 'Not Cooked';
+                    selectedVote = 'Not Cooked';
                 }
             });
         });
 
-        // --- LIVE DATABASE LISTENER ---
-        if(db) {
-            const q = query(collection(db, "comments"), orderBy("timestamp", "desc"));
-            onSnapshot(q, (snapshot) => {
-                const feed = document.getElementById('commentsFeed');
-                feed.innerHTML = '';
-                
-                let cooked = 0, uncooked = 0;
-
-                snapshot.forEach((doc) => {
-                    const c = doc.data();
-                    
-                    if(c.vote === 'Cooked') cooked++; else uncooked++;
-
-                    const isSug = c.userCode.toLowerCase() === 'sug';
-                    const badgeColor = c.vote === 'Cooked' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400';
-                    
-                    feed.innerHTML += `
-                        <div class="apple-widget p-5">
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <span class="font-bold text-white text-lg tracking-tight">${c.displayName}</span>
-                                    <span class="text-gray-400 text-sm ml-1">(${c.userCode})</span>
-                                    ${isSug ? '<span class="text-yellow-400 ml-1" title="Reserved User">⭐</span>' : ''}
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badgeColor}">
-                                    ${c.vote}
-                                </span>
-                            </div>
-                            <p class="text-gray-200 text-md leading-relaxed mb-4">${c.text}</p>
-                            <div class="flex gap-4 text-xs font-medium text-gray-500">
-                                <span>💻 ${c.device}</span>
-                                <span>🔑 ${c.hwid}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                if (snapshot.empty) {
-                    feed.innerHTML = '<p class="text-gray-500 text-center py-8">No comments yet. Be the first!</p>';
-                }
-
-                // Update Live Bar
-                let total = cooked + uncooked;
-                let pCooked = total === 0 ? 50 : Math.round((cooked/total)*100);
-                let pUncooked = total === 0 ? 50 : 100 - pCooked;
-
-                document.getElementById('cookedCount').innerText = total === 0 ? 0 : pCooked;
-                document.getElementById('uncookedCount').innerText = total === 0 ? 0 : pUncooked;
-                document.getElementById('barCooked').style.width = `${pCooked}%`;
-                document.getElementById('barUncooked').style.width = `${pUncooked}%`;
-                document.getElementById('totalVotesText').innerText = `${total} Total Votes Cast`;
-            }, (error) => {
-                console.error("Firestore error (did you enable Test Mode?):", error);
-            });
-        }
-
-        // --- AUTH & SUBMIT LOGIC ---
-        postBtn.addEventListener('click', () => {
-            const dName = document.getElementById('displayName').value.trim();
-            const text = document.getElementById('commentText').value.trim();
-
-            if (!dName || !text || !currentVote) return alert("Please fill your name, comment, and select a vote!");
-            
-            authModal.classList.remove('hidden');
-            authModal.classList.add('flex');
-        });
-
-        cancelAuth.addEventListener('click', () => {
-            authModal.classList.add('hidden');
-            authModal.classList.remove('flex');
-        });
-
-        confirmAuth.addEventListener('click', async () => {
-            if(!db) return alert("Firebase is not connected. Check your internet or console errors.");
-
-            const uCode = document.getElementById('userCode').value.trim();
-            const uPass = document.getElementById('userPass').value.trim();
-
-            if (uCode.length < 3) return alert("User code must be at least 3 characters!");
-            if (!uPass) return alert("Password required!");
-
-            // SUG protection - The password for 'sug' is 'megumi'. You can change it below if you want!
-            if (uCode.toLowerCase() === 'sug' && uPass !== 'megumi') { 
-                return alert("Incorrect password for reserved user 'sug'.");
-            }
+        document.getElementById('submitVoteBtn').addEventListener('click', async () => {
+            if (!selectedVote) return alert("Select Cooked or Not Cooked first!");
+            if (!currentUser) return alert("You must be logged in!");
 
             try {
-                // Check Firebase for user password
-                if (uCode.toLowerCase() !== 'sug') {
-                    const userRef = doc(db, "users", uCode);
-                    const userSnap = await getDoc(userRef);
+                // Save vote specifically tied to userCode (so they can only have 1 active vote)
+                await setDoc(doc(db, "votes", currentUser.userCode.toLowerCase()), {
+                    vote: selectedVote,
+                    timestamp: Date.now()
+                });
+                alert("Vote locked in successfully!");
+            } catch(e) {
+                console.error(e);
+                alert("Error saving vote!");
+            }
+        });
 
-                    if (userSnap.exists()) {
-                        if (userSnap.data().password !== uPass) return alert("Wrong password for this user code!");
-                    } else {
-                        await setDoc(userRef, { password: uPass });
-                    }
-                }
+        // Listen to Live Votes
+        onSnapshot(collection(db, "votes"), (snapshot) => {
+            let cooked = 0, uncooked = 0;
+            snapshot.forEach((doc) => {
+                if(doc.data().vote === 'Cooked') cooked++;
+                else uncooked++;
+            });
 
-                // Save comment
+            let total = cooked + uncooked;
+            let pCooked = total === 0 ? 50 : Math.round((cooked/total)*100);
+            let pUncooked = total === 0 ? 50 : 100 - pCooked;
+
+            document.getElementById('cookedCount').innerText = total === 0 ? 0 : pCooked;
+            document.getElementById('uncookedCount').innerText = total === 0 ? 0 : pUncooked;
+            document.getElementById('barCooked').style.width = `${pCooked}%`;
+            document.getElementById('barUncooked').style.width = `${pUncooked}%`;
+            document.getElementById('totalVotesText').innerText = `${total} Total Votes Cast`;
+        });
+
+        // --- COMMENT SYSTEM (Separate Card) ---
+        document.getElementById('postCommentBtn').addEventListener('click', async () => {
+            const text = document.getElementById('commentText').value.trim();
+            if (!text) return alert("Write a comment first!");
+            if (!currentUser) return alert("You must be logged in!");
+
+            try {
                 const { device, hwid } = getDeviceAndHWID();
                 await addDoc(collection(db, "comments"), {
-                    displayName: document.getElementById('displayName').value.trim(),
-                    userCode: uCode,
-                    text: document.getElementById('commentText').value.trim(),
-                    vote: currentVote,
+                    displayName: currentUser.displayName,
+                    userCode: currentUser.userCode,
+                    text: text,
                     device: device,
                     hwid: hwid,
                     timestamp: Date.now()
                 });
                 
-                // Cleanup UI
-                authModal.classList.add('hidden');
-                authModal.classList.remove('flex');
                 document.getElementById('commentText').value = '';
-                document.getElementById('userPass').value = ''; 
-                
             } catch(e) {
                 console.error(e);
-                alert("Error saving! Did you enable Firestore Database in your Firebase Console?");
+                alert("Error saving comment!");
             }
         });
+
+        // Listen to Live Comments
+        const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
+        onSnapshot(qComments, (snapshot) => {
+            const feed = document.getElementById('commentsFeed');
+            feed.innerHTML = '';
+
+            snapshot.forEach((doc) => {
+                const c = doc.data();
+                const isSug = c.userCode.toLowerCase() === 'sug';
+                
+                feed.innerHTML += `
+                    <div class="apple-widget p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="font-bold text-white text-lg tracking-tight">${c.displayName}</span>
+                                <span class="text-gray-400 text-sm ml-1">(${c.userCode})</span>
+                                ${isSug ? '<span class="text-yellow-400 ml-1" title="Reserved User">⭐</span>' : ''}
+                            </div>
+                        </div>
+                        <p class="text-gray-200 text-md leading-relaxed mb-4">${c.text}</p>
+                        <div class="flex gap-4 text-xs font-medium text-gray-500">
+                            <span>💻 ${c.device}</span>
+                            <span>🔑 ${c.hwid}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (snapshot.empty) {
+                feed.innerHTML = '<p class="text-gray-500 text-center py-8">No comments yet. Be the first!</p>';
+            }
+        });
+
     </script>
 </body>
 </html>
