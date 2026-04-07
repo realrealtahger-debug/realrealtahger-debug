@@ -1,645 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Space — Personal Page</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  :root {
-    --bg: #0e0d0b; --surface: #161512; --surface2: #1e1c18;
-    --border: #2a2720; --accent: #e8c87a; --accent2: #c45c3b;
-    --text: #f0ead8; --muted: #8a8070;
-    --sidebar-w: 240px; --topbar-h: 56px;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-weight:300; min-height:100vh; overflow-x:hidden; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saweedas Khanteetaow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Apple/macOS Aesthetic CSS */
+        :root {
+            --apple-blue: #0A84FF;
+            --apple-red: #FF453A;
+            --apple-bg: #000000;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--apple-bg);
+            color: #F5F5F7;
+            margin: 0;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(60, 20, 100, 0.4), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(10, 80, 150, 0.3), transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
 
-  #topbar { position:fixed; top:0; left:0; right:0; height:var(--topbar-h); background:rgba(14,13,11,0.85); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px 0 calc(var(--sidebar-w) + 24px); z-index:100; }
-  .topbar-logo { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; color:var(--accent); }
-  .topbar-nav { display:flex; gap:28px; list-style:none; }
-  .topbar-nav a { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color .2s; }
-  .topbar-nav a:hover { color:var(--accent); }
-  .topbar-right { display:flex; align-items:center; gap:14px; }
-  .status-dot { width:8px; height:8px; border-radius:50%; background:#4caf82; box-shadow:0 0 8px #4caf82aa; animation:pulse-dot 2s infinite; }
-  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
-  .status-text { font-size:12px; color:var(--muted); }
+        /* Liquid Glass effect */
+        .apple-glass {
+            background: rgba(30, 30, 32, 0.45);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
 
-  #sidebar { position:fixed; top:var(--topbar-h); left:0; width:var(--sidebar-w); height:calc(100vh - var(--topbar-h)); background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:28px 0; z-index:90; overflow-y:auto; }
-  .sidebar-section { padding:0 20px 20px; border-bottom:1px solid var(--border); margin-bottom:20px; }
-  .sidebar-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
-  .sidebar-avatar { width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--accent)); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--bg); margin-bottom:10px; }
-  .sidebar-name { font-family:'DM Serif Display',serif; font-size:16px; color:var(--text); margin-bottom:3px; }
-  .sidebar-handle { font-size:12px; color:var(--muted); margin-bottom:12px; }
-  .owner-login-btn { display:flex; align-items:center; gap:6px; width:100%; padding:7px 10px; background:transparent; border:1px dashed var(--border); color:var(--muted); font-size:10px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; border-radius:2px; }
-  .owner-login-btn:hover { border-color:var(--accent); color:var(--accent); }
-  .owner-login-btn.logged-in { border-color:#4caf82; color:#4caf82; border-style:solid; }
-  .owner-login-btn.logged-in:hover { border-color:var(--accent2); color:var(--accent2); }
-  .owner-dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
-  .sidebar-nav { list-style:none; }
-  .sidebar-nav li a { display:flex; align-items:center; gap:10px; padding:9px 20px; font-size:13px; color:var(--muted); text-decoration:none; transition:all .2s; border-left:2px solid transparent; }
-  .sidebar-nav li a:hover, .sidebar-nav li a.active { color:var(--text); border-left-color:var(--accent); background:rgba(232,200,122,.04); }
-  .nav-icon { font-size:15px; }
-  .sidebar-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px; }
-  .stat-box { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center; }
-  .stat-num { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--accent); letter-spacing:1px; }
-  .stat-lbl { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
+        .apple-widget {
+            background: rgba(40, 40, 44, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 22px;
+            transition: transform 0.2s ease;
+        }
+        .apple-widget:hover { transform: scale(1.01); }
 
-  #main { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; }
+        /* iOS style inputs */
+        .apple-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            color: white;
+            padding: 12px 16px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .apple-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.2);
+        }
 
-  #hero { position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:80px 80px 60px; overflow:hidden; }
-  .hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 70% 40%,rgba(196,92,59,.12) 0%,transparent 60%),radial-gradient(ellipse 40% 60% at 20% 80%,rgba(232,200,122,.07) 0%,transparent 55%); pointer-events:none; }
-  .hero-line { width:60px; height:2px; background:var(--accent); margin-bottom:28px; animation:line-grow .8s ease forwards; transform-origin:left; }
-  @keyframes line-grow { from{transform:scaleX(0)} to{transform:scaleX(1)} }
-  .hero-eyebrow { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:16px; animation:fade-up .6s .2s both; }
-  .hero-name { font-family:'Bebas Neue',sans-serif; font-size:clamp(72px,10vw,140px); line-height:.9; letter-spacing:4px; color:var(--text); margin-bottom:6px; animation:fade-up .6s .3s both; }
-  .hero-name span { color:var(--accent); }
-  .hero-title { font-family:'DM Serif Display',serif; font-style:italic; font-size:clamp(20px,3vw,32px); color:var(--muted); margin-bottom:32px; animation:fade-up .6s .4s both; }
-  .hero-bio { max-width:520px; font-size:15px; line-height:1.8; color:#b0a898; margin-bottom:40px; animation:fade-up .6s .5s both; }
-  .hero-cta { display:flex; gap:14px; animation:fade-up .6s .6s both; }
-  .btn-primary { padding:12px 28px; background:var(--accent); color:var(--bg); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500; border:none; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-  .btn-primary:hover { background:#f0d890; transform:translateY(-1px); }
-  .btn-ghost { padding:12px 28px; background:transparent; color:var(--text); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500; border:1px solid var(--border); cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
-  .hero-scroll { position:absolute; bottom:40px; left:80px; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:11px; letter-spacing:2px; text-transform:uppercase; animation:fade-up .6s .8s both; }
-  .scroll-line { width:40px; height:1px; background:var(--muted); animation:extend 1.5s ease infinite; }
-  @keyframes extend { 0%,100%{width:40px} 50%{width:70px} }
-  @keyframes fade-up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        /* Apple Buttons */
+        .apple-btn {
+            background: var(--apple-blue);
+            color: white;
+            border-radius: 999px;
+            font-weight: 600;
+            padding: 10px 24px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .apple-btn:active { transform: scale(0.96); opacity: 0.8; }
 
-  .section { padding:80px 80px; border-top:1px solid var(--border); }
-  .section-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:10px; }
-  .section-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(38px,5vw,64px); letter-spacing:3px; color:var(--text); margin-bottom:40px; line-height:1; }
+        /* iOS Segmented Control for Voting */
+        .segmented-control {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 4px;
+        }
+        .segment {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .segment.selected-cooked { background: var(--apple-red); color: white; box-shadow: 0 2px 8px rgba(255, 69, 58, 0.4); }
+        .segment.selected-uncooked { background: var(--apple-blue); color: white; box-shadow: 0 2px 8px rgba(10, 132, 255, 0.4); }
 
-  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; }
-  .about-text { font-size:15px; line-height:1.9; color:#b0a898; }
-  .about-text p { margin-bottom:18px; }
-  .about-cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .about-card { background:var(--surface); border:1px solid var(--border); padding:20px; transition:border-color .2s,transform .2s; }
-  .about-card:hover { border-color:var(--accent); transform:translateY(-2px); }
-  .card-icon { font-size:24px; margin-bottom:10px; }
-  .card-title { font-family:'DM Serif Display',serif; font-size:15px; color:var(--text); margin-bottom:6px; }
-  .card-desc { font-size:12px; color:var(--muted); line-height:1.6; }
+        /* Live Bar */
+        .live-bar-container { height: 14px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; display: flex; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        .bar-cooked { background: linear-gradient(90deg, #ff3b30, #ff453a); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bar-uncooked { background: linear-gradient(90deg, #007aff, #0a84ff); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Hidden Scrollbar for Feed */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* SECTION HEADER WITH REFRESH */
-  .section-header { display:flex; align-items:baseline; gap:12px; margin-bottom:40px; }
-  .section-header .section-title { margin-bottom:0; }
-  .refresh-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:4px 6px; transition:all .2s; border:1px solid transparent; border-radius:2px; line-height:1; }
-  .refresh-btn:hover { color:var(--accent); border-color:var(--border); }
-  .refresh-btn.spinning { animation:spin .5s linear; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-
-  .owner-badge { display:inline-block; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; background:rgba(232,200,122,.15); color:var(--accent); padding:2px 7px; border:1px solid rgba(232,200,122,.3); margin-left:6px; vertical-align:middle; }
-
-  .comments-list { display:flex; flex-direction:column; gap:14px; margin-bottom:30px; }
-  .comment-card { background:var(--surface); border:1px solid var(--border); padding:18px 20px; display:flex; gap:14px; }
-  .comment-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--bg); flex-shrink:0; font-family:'Bebas Neue',sans-serif; letter-spacing:1px; }
-  .comment-body { flex:1; }
-  .comment-meta { display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
-  .comment-name { font-size:13px; font-weight:500; color:var(--text); }
-  .comment-time { font-size:11px; color:var(--muted); }
-  .comment-text { font-size:14px; color:#b0a898; line-height:1.7; }
-  .comment-actions { display:flex; gap:10px; margin-top:10px; }
-  .comment-action-btn { background:none; border:none; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:color .2s; padding:2px 0; font-family:'DM Sans',sans-serif; }
-  .comment-action-btn:hover { color:var(--accent); }
-  .comment-action-btn.delete:hover { color:var(--accent2); }
-  .comment-input-area { background:var(--surface); border:1px solid var(--border); padding:18px 20px; display:flex; gap:14px; align-items:flex-start; transition:border-color .3s; }
-  .comment-input-area:focus-within { border-color:rgba(232,200,122,.4); }
-  .comment-input-inner { flex:1; }
-  .field-input { background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:8px 12px; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
-  .field-input:focus { border-color:var(--accent); }
-  .field-textarea { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px 12px; font-family:'DM Sans',sans-serif; font-size:14px; resize:vertical; min-height:80px; outline:none; transition:border-color .2s; margin-bottom:10px; display:block; }
-  .field-textarea:focus { border-color:var(--accent); }
-
-  #vote { background:var(--surface); border-top:1px solid var(--border); }
-  .vote-inner { padding:80px 80px; }
-  .vote-question { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,6vw,80px); letter-spacing:4px; line-height:1; margin-bottom:14px; }
-  .vote-question span { color:var(--accent2); }
-  .vote-sub { font-size:14px; color:var(--muted); margin-bottom:40px; }
-  .vote-buttons { display:flex; gap:16px; margin-bottom:40px; flex-wrap:wrap; }
-  .vote-btn { padding:16px 40px; font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; border:2px solid var(--border); background:transparent; cursor:pointer; transition:all .25s; display:flex; align-items:center; gap:10px; color:var(--text); }
-  .vote-btn:hover { transform:translateY(-2px); }
-  .vote-btn.yes-btn:hover,.vote-btn.yes-btn.selected { background:rgba(196,92,59,.15); border-color:var(--accent2); color:var(--accent2); }
-  .vote-btn.no-btn:hover,.vote-btn.no-btn.selected { background:rgba(76,175,130,.1); border-color:#4caf82; color:#4caf82; }
-  .vote-count { font-family:'DM Serif Display',serif; font-size:18px; }
-  .vote-bar-wrap { margin-bottom:32px; }
-  .vote-bar-labels { display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; }
-  .lbl-yes { color:var(--accent2); } .lbl-no { color:#4caf82; }
-  .vote-bar-track { height:6px; background:var(--surface2); border:1px solid var(--border); overflow:hidden; }
-  .vote-bar-fill { height:100%; background:var(--accent2); transition:width .5s cubic-bezier(.4,0,.2,1); }
-
-  .notes-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
-  .vote-notes-title { font-family:'DM Serif Display',serif; font-size:20px; color:var(--text); }
-  .vote-notes-list { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; max-height:300px; overflow-y:auto; }
-  .vote-note-card { background:var(--surface2); border:1px solid var(--border); padding:14px 18px; display:flex; gap:12px; align-items:flex-start; }
-  .note-verdict { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; padding:3px 8px; flex-shrink:0; }
-  .note-verdict.yes { background:rgba(196,92,59,.2); color:var(--accent2); }
-  .note-verdict.no { background:rgba(76,175,130,.15); color:#4caf82; }
-  .note-body { flex:1; }
-  .note-text { font-size:13px; color:#b0a898; line-height:1.6; }
-  .note-meta { font-size:11px; color:var(--muted); margin-top:4px; display:flex; align-items:center; gap:6px; }
-  .note-remove { cursor:pointer; color:var(--accent2); font-size:11px; }
-  .note-remove:hover { text-decoration:underline; }
-  .vote-note-input-wrap { background:var(--surface2); border:1px solid var(--border); padding:18px; transition:border-color .3s; }
-  .vote-note-input-wrap:focus-within { border-color:rgba(232,200,122,.4); }
-  .vote-note-header { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
-  .note-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
-  .field-select { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:9px 14px; font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; outline:none; transition:border-color .2s; }
-  .field-select:focus { border-color:var(--accent); }
-
-  footer { padding:30px 80px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--muted); letter-spacing:1px; }
-  footer span { color:var(--accent); }
-
-  .toast { position:fixed; bottom:30px; right:30px; background:var(--accent); color:var(--bg); padding:12px 22px; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500; z-index:300; transform:translateY(80px); opacity:0; transition:all .3s; font-family:'DM Sans',sans-serif; }
-  .toast.show { transform:translateY(0); opacity:1; }
-  .loading { display:inline-block; width:12px; height:12px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin2 .6s linear infinite; vertical-align:middle; }
-  @keyframes spin2 { to{transform:rotate(360deg)} }
-  .empty-state { font-size:13px; color:var(--muted); padding:10px 0; }
-
-  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(10px); z-index:200; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
-  .modal-overlay.open { opacity:1; pointer-events:all; }
-  .modal { background:var(--surface); border:1px solid var(--border); padding:36px; width:380px; max-width:94vw; transform:translateY(20px); transition:transform .25s; }
-  .modal-overlay.open .modal { transform:translateY(0); }
-  .modal-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:3px; color:var(--text); margin-bottom:6px; }
-  .modal-sub { font-size:12px; color:var(--muted); margin-bottom:24px; }
-  .modal-label { display:block; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
-  .modal-input { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px 14px; font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:border-color .2s; margin-bottom:18px; }
-  .modal-input:focus { border-color:var(--accent); }
-  .modal-error { font-size:12px; color:var(--accent2); margin-bottom:14px; min-height:16px; }
-  .modal-actions { display:flex; gap:12px; }
-
-  ::-webkit-scrollbar { width:6px; }
-  ::-webkit-scrollbar-track { background:var(--bg); }
-  ::-webkit-scrollbar-thumb { background:var(--border); }
-  ::-webkit-scrollbar-thumb:hover { background:var(--muted); }
-
-  @media (max-width:768px) {
-    :root { --sidebar-w:0px; }
-    #sidebar { display:none; }
-    #topbar { padding-left:24px; }
-    #hero,.section,.vote-inner,footer { padding-left:24px; padding-right:24px; }
-    .about-grid { grid-template-columns:1fr; }
-    footer { flex-direction:column; gap:8px; }
-  }
-</style>
+        .hero-title { font-weight: 800; letter-spacing: -0.04em; }
+        .section-title { font-weight: 700; letter-spacing: -0.02em; color: rgba(255,255,255,0.9); }
+    </style>
 </head>
-<body>
+<body class="p-6 md:p-12 antialiased">
 
-<header id="topbar">
-  <div class="topbar-logo">MYSPACE</div>
-  <nav><ul class="topbar-nav">
-    <li><a href="#hero">Home</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#comments">Comments</a></li>
-    <li><a href="#vote">Am I Cooked?</a></li>
-  </ul></nav>
-  <div class="topbar-right">
-    <div class="status-dot"></div>
-    <span class="status-text">Live</span>
-  </div>
-</header>
-
-<aside id="sidebar">
-  <div class="sidebar-section">
-    <div class="sidebar-label">Profile</div>
-    <div class="sidebar-avatar">S</div>
-    <div class="sidebar-name">Saweedas Khanteetaow/Gown/Sugar</div>
-    <div class="sidebar-handle">@real.gown on ig</div>
-    <button class="owner-login-btn" id="owner-btn" onclick="handleOwnerBtn()">
-      <span class="owner-dot"></span>
-      <span id="owner-btn-label">Owner Login</span>
-    </button>
-  </div>
-  <ul class="sidebar-nav">
-    <li><a href="#hero" class="active"><span class="nav-icon">◈</span> Home</a></li>
-    <li><a href="#about"><span class="nav-icon">◉</span> About</a></li>
-    <li><a href="#comments"><span class="nav-icon">◎</span> Comments</a></li>
-    <li><a href="#vote"><span class="nav-icon">◆</span> Am I Cooked?</a></li>
-  </ul>
-  <div style="margin-top:auto;padding-top:24px;">
-    <div class="sidebar-label" style="padding:0 20px;margin-bottom:12px;">Live Stats</div>
-    <div class="sidebar-stats">
-      <div class="stat-box"><div class="stat-num" id="stat-comments">—</div><div class="stat-lbl">Comments</div></div>
-      <div class="stat-box"><div class="stat-num" id="stat-votes">—</div><div class="stat-lbl">Votes</div></div>
-      <div class="stat-box" style="grid-column:1/-1;"><div class="stat-num" id="stat-verdict" style="font-size:16px;letter-spacing:1px;">—</div><div class="stat-lbl">Current Verdict</div></div>
-    </div>
-  </div>
-</aside>
-
-<main id="main">
-
-  <section id="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-line"></div>
-    <div class="hero-eyebrow">✦ Welcome to my corner of the internet</div>
-    <h1 class="hero-name">Saweedas<br><span>Khanteetaow (Sugar/Gown)</span></h1>
-    <p class="hero-title">Designer · Developer · Human</p>
-    <p class="hero-bio">honestly!!! i just make random stuff a lot, most of the time its not even me, but atleast its functional i guess? im not proud of it but at least it works O_O</p>
-    <div class="hero-cta">
-      <button class="btn-ghost" onclick="document.getElementById('vote').scrollIntoView({behavior:'smooth'})">Am I Cooked? →</button>
-    </div>
-    <div class="hero-scroll"><div class="scroll-line"></div> Scroll down</div>
-  </section>
-
-  <section id="about" class="section">
-    <div class="section-label">§ 01 — About</div>
-    <h2 class="section-title">A BIT ABOUT ME</h2>
-    <div class="about-grid">
-      <div class="about-text">
-        <p>im pretty dang uncreative dude, and like, i only know how to code in luau, you know this website you're reading off? i only made the interface and i make ai put the functionality in it....</p>
-        <p>im not proud of it... but it works i guess?????????/ i already said this but oh well,, its true i guess cuz like i actually have potential but im too fkn lazy to actually reach my full potential, megumi in a nutshell.</p>
-        <p>i look forward to being friends with you all!!! love love!!</p>
-      </div>
-      <div class="about-cards">
-        <div class="about-card"><div class="card-icon">🎨</div><div class="card-title">Design</div><div class="card-desc">visual design and ui/ux is pretty good</div></div>
-        <div class="about-card"><div class="card-icon">⚡</div><div class="card-title">Code</div><div class="card-desc">luau/lua exclusive to python yes yes yummers</div></div>
-        <div class="about-card"><div class="card-icon">☕</div><div class="card-title">Coffee</div><div class="card-desc">coffe tastes terrible!!! i like tea better!</div></div>
-        <div class="about-card"><div class="card-icon">🌙</div><div class="card-title">Chaos</div><div class="card-desc">deep sleeper. mrrp meow</div></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="comments" class="section">
-    <div class="section-label">§ 02 — Guestbook</div>
-    <div class="section-header">
-      <h2 class="section-title">LEAVE A NOTE</h2>
-      <button class="refresh-btn" id="refresh-comments-btn" onclick="refreshComments()" title="Refresh comments">↻</button>
-    </div>
-    <div class="comments-list" id="comments-list"><div class="empty-state">Loading <span class="loading"></span></div></div>
-    <div class="comment-input-area">
-      <div class="comment-avatar" style="background:linear-gradient(135deg,#3a3632,#5a5248);width:36px;height:36px;border-radius:50%;">?</div>
-      <div class="comment-input-inner">
-        <input class="field-input" id="new-comment-name" placeholder="Your name..." maxlength="40" style="width:200px;margin-bottom:10px;display:block;">
-        <textarea class="field-textarea" id="new-comment-text" placeholder="Leave a note..."></textarea>
-        <button class="btn-primary" onclick="submitComment()" style="font-size:11px;padding:10px 22px;">Post Comment</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="vote">
-    <div class="vote-inner">
-      <div class="section-label">§ 03 — The Verdict</div>
-      <div class="vote-question">CHAT,<br>AM I <span>COOKED?</span></div>
-      <p class="vote-sub">Cast your honest verdict. Results are live across all devices. No mercy.</p>
-      <div class="vote-buttons">
-        <button class="vote-btn yes-btn" id="vote-yes-btn" onclick="castVote('yes')">🔥 YES <span class="vote-count" id="yes-count">0</span></button>
-        <button class="vote-btn no-btn" id="vote-no-btn" onclick="castVote('no')">💅 NO <span class="vote-count" id="no-count">0</span></button>
-      </div>
-      <div class="vote-bar-wrap">
-        <div class="vote-bar-labels">
-          <span class="lbl-yes">🔥 Cooked — <span id="yes-pct">0</span>%</span>
-          <span class="lbl-no"><span id="no-pct">0</span>% — Not Cooked 💅</span>
+    <!-- Hero Section -->
+    <header class="max-w-4xl mx-auto text-center mt-8 mb-16">
+        <h1 class="hero-title text-5xl md:text-7xl mb-2 text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500">
+            Saweedas Khanteetaow
+        </h1>
+        <p class="text-xl md:text-2xl font-medium text-gray-400 mb-6">(Sugar/Gown)</p>
+        <p class="text-sm font-semibold tracking-widest text-blue-400 uppercase mb-8">Designer · Developer · Human</p>
+        <div class="apple-glass p-8 max-w-2xl mx-auto text-left">
+            <p class="text-gray-300 leading-relaxed text-lg">
+                honestly!!! i just make random stuff a lot, most of the time its not even me, but atleast its functional i guess? im not proud of it but at least it works O_O
+            </p>
         </div>
-        <div class="vote-bar-track"><div class="vote-bar-fill" id="vote-bar" style="width:0%"></div></div>
-      </div>
-      <div style="margin-top:40px;">
-        <div class="notes-header">
-          <div class="vote-notes-title">Voter Notes</div>
-          <button class="refresh-btn" id="refresh-notes-btn" onclick="refreshNotes()" title="Refresh notes">↻</button>
+    </header>
+
+    <!-- About Section -->
+    <section class="max-w-4xl mx-auto mb-16">
+        <h2 class="section-title text-2xl mb-6 ml-2">§ 01 — About</h2>
+        <p class="text-gray-400 mb-8 max-w-xl ml-2">
+            A BIT ABOUT ME. im pretty dang uncreative dude, and like, i only know how to code in luau, i make ai put the functionality in it.... i actually have potential but im too fkn lazy to actually reach my full potential, megumi in a nutshell.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="apple-widget p-6">
+                <div class="text-3xl mb-4">🎨</div>
+                <h3 class="font-bold text-lg mb-2">Visual Design</h3>
+                <p class="text-gray-400 text-sm">UI/UX is pretty good fr</p>
+            </div>
+            <div class="apple-widget p-6">
+                <div class="text-3xl mb-4">⚡</div>
+                <h3 class="font-bold text-lg mb-2">Luau/Lua</h3>
+                <p class="text-gray-400 text-sm">Exclusive to Python yes yummers</p>
+            </div>
+            <div class="apple-widget p-6">
+                <div class="text-3xl mb-4">🌙</div>
+                <h3 class="font-bold text-lg mb-2">Deep Sleeper</h3>
+                <p class="text-gray-400 text-sm">mrrp meow</p>
+            </div>
         </div>
-        <div class="vote-notes-list" id="vote-notes-list"><div class="empty-state">Loading <span class="loading"></span></div></div>
-        <div class="vote-note-input-wrap">
-          <div class="vote-note-header">Leave a note with your vote</div>
-          <div class="note-row">
-            <select class="field-select" id="note-verdict">
-              <option value="">Verdict...</option>
-              <option value="yes">🔥 Yes, cooked</option>
-              <option value="no">💅 No, you're fine</option>
-            </select>
-            <input class="field-input" id="note-name" placeholder="Your name..." maxlength="40" style="flex:1;min-width:140px;">
-          </div>
-          <textarea class="field-textarea" id="note-text" placeholder="Drop your take here..." style="margin-top:0;min-height:70px;"></textarea>
-          <button class="btn-primary" onclick="submitNote()" style="font-size:11px;padding:10px 22px;">Submit Note</button>
+    </section>
+
+    <!-- Interactive Sections -->
+    <section class="max-w-4xl mx-auto space-y-8 mb-20">
+        
+        <!-- CARD 1: Input Section -->
+        <div class="apple-glass p-8">
+            <h2 class="section-title text-2xl mb-6">Leave your thoughts</h2>
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="displayName" placeholder="Display Name (e.g. GeometryDasher)" class="apple-input">
+                    <div class="segmented-control" id="voteControl">
+                        <div class="segment" data-vote="cooked">Cooked</div>
+                        <div class="segment" data-vote="not_cooked">Not Cooked</div>
+                    </div>
+                </div>
+                <textarea id="commentText" placeholder="Write something..." rows="3" class="apple-input resize-none"></textarea>
+                <div class="flex justify-end">
+                    <button id="postBtn" class="apple-btn">Post Comment</button>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- CARD 2: Comments Feed (Scrollable) -->
+        <div>
+            <h2 class="section-title text-xl mb-4 ml-2">Community Feed</h2>
+            <div id="commentsFeed" class="space-y-4 max-h-[500px] overflow-y-auto hide-scrollbar pb-4 px-1">
+                <!-- Comments load here -->
+            </div>
+        </div>
+
+        <!-- CARD 3: Overall Verdict (Live Bar) -->
+        <div class="apple-glass p-8">
+            <h2 class="section-title text-2xl mb-8">Overall Verdict</h2>
+            <div>
+                <div class="flex justify-between text-sm font-semibold mb-3">
+                    <span class="text-red-400">Cooked (<span id="cookedCount">0</span>%)</span>
+                    <span class="text-blue-400">Not Cooked (<span id="uncookedCount">0</span>%)</span>
+                </div>
+                <div class="live-bar-container">
+                    <div id="barCooked" class="bar-cooked" style="width: 50%"></div>
+                    <div id="barUncooked" class="bar-uncooked" style="width: 50%"></div>
+                </div>
+                <p class="text-center text-xs text-gray-500 mt-4 font-medium" id="totalVotesText">0 Total Votes Cast</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- macOS Style Auth Modal -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="apple-glass p-8 w-full max-w-sm text-center">
+            <h3 class="text-xl font-bold mb-2">Authentication</h3>
+            <p class="text-xs text-gray-400 mb-6">Enter a User Code (min 3 chars). If it's your first time, choose a password to lock it.</p>
+            
+            <div class="space-y-4 mb-6 text-left">
+                <input type="text" id="userCode" placeholder="User Code (e.g. ope)" class="apple-input">
+                <input type="password" id="userPass" placeholder="Password" class="apple-input">
+            </div>
+            
+            <div class="flex gap-3 justify-end">
+                <button id="cancelAuth" class="px-4 py-2 rounded-full text-sm text-gray-400 hover:text-white transition">Cancel</button>
+                <button id="confirmAuth" class="apple-btn">Confirm</button>
+            </div>
+        </div>
     </div>
-  </section>
 
-  <footer>
-    <div>Made with love (and existential dread) — <span>gown</span></div>
-    <div id="footer-time"></div>
-  </footer>
-</main>
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-<!-- LOGIN MODAL -->
-<div class="modal-overlay" id="login-modal">
-  <div class="modal">
-    <div class="modal-title">OWNER LOGIN</div>
-    <div class="modal-sub">This area is just for Gown. Hands off!! 🐱</div>
-    <label class="modal-label">Password</label>
-    <input class="modal-input" type="password" id="login-pw" placeholder="••••••••••" onkeydown="if(event.key==='Enter') attemptLogin()">
-    <div class="modal-error" id="login-error"></div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="attemptLogin()" style="font-size:11px;padding:10px 22px;">Log In</button>
-      <button class="btn-ghost" onclick="closeLoginModal()" style="font-size:11px;padding:10px 22px;">Cancel</button>
-    </div>
-  </div>
-</div>
+        // YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6ciclM7NFpDx-J4YYyirGmFr9lddsJFw",
+            authDomain: "castavote.firebaseapp.com",
+            projectId: "castavote",
+            storageBucket: "castavote.firebasestorage.app",
+            messagingSenderId: "696359303530",
+            appId: "1:696359303530:web:4674d2ae8fb5c175680d13",
+            measurementId: "G-69JPN6ZYC0"
+        };
 
-<div class="toast" id="toast"></div>
+        let db;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch(e) {
+            console.error("Firebase Initialization Error:", e);
+        }
 
-<script>
-const { createClient } = supabase;
-const sb = createClient(
-  'https://oaktdoegqcwrimvrmpan.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ha3Rkb2VncWN3cmltdnJtcGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MjA2NjEsImV4cCI6MjA4ODE5NjY2MX0._ePeRzkrfyxiJHs7M1YvpXgI-9aWhw_f6TFxWTpWvqc'
-);
+        // --- HWID & DEVICE GENERATOR ---
+        function getDeviceAndHWID() {
+            const ua = navigator.userAgent;
+            let device = "Desktop";
+            if (/iPhone|iPad|iPod/.test(ua)) device = "iOS";
+            else if (/Mac/.test(ua)) device = "macOS";
+            else if (/Android/.test(ua)) device = "Android";
+            else if (/Windows/.test(ua)) device = "Windows";
 
-// ── SESSION ID — unique per browser, used to own comments/notes ──
-let sessionId = localStorage.getItem('session_id');
-if (!sessionId) {
-  sessionId = 'sid_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-  localStorage.setItem('session_id', sessionId);
-}
+            let hwid = localStorage.getItem('sug_hwid');
+            if (!hwid) {
+                hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+                localStorage.setItem('sug_hwid', hwid);
+            }
+            return { device, hwid };
+        }
 
-// ── VOTER ID (separate from session, for votes) ──
-let voterId = localStorage.getItem('voter_id');
-if (!voterId) {
-  voterId = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-  localStorage.setItem('voter_id', voterId);
-}
-let myVote = null;
+        let currentVote = null;
 
-// ── OWNER AUTH ──
-const _p = ['s','u','g','a','r','m','u','m','1','2','3'];
-let isOwner = sessionStorage.getItem('owner_auth') === 'yes';
+        const voteSegments = document.querySelectorAll('.segment');
+        const postBtn = document.getElementById('postBtn');
+        const authModal = document.getElementById('authModal');
+        const cancelAuth = document.getElementById('cancelAuth');
+        const confirmAuth = document.getElementById('confirmAuth');
+        
+        // --- UI LOGIC ---
+        voteSegments.forEach(seg => {
+            seg.addEventListener('click', () => {
+                voteSegments.forEach(s => s.className = 'segment');
+                if (seg.dataset.vote === 'cooked') {
+                    seg.classList.add('selected-cooked');
+                    currentVote = 'Cooked';
+                } else {
+                    seg.classList.add('selected-uncooked');
+                    currentVote = 'Not Cooked';
+                }
+            });
+        });
 
-function handleOwnerBtn() {
-  if (isOwner) {
-    isOwner = false;
-    sessionStorage.removeItem('owner_auth');
-    updateOwnerUI();
-    renderComments();
-    renderNotes();
-    toast('Logged out 👋');
-  } else {
-    openLoginModal();
-  }
-}
-function openLoginModal() {
-  document.getElementById('login-pw').value = '';
-  document.getElementById('login-error').textContent = '';
-  document.getElementById('login-modal').classList.add('open');
-  setTimeout(() => document.getElementById('login-pw').focus(), 200);
-}
-function closeLoginModal() { document.getElementById('login-modal').classList.remove('open'); }
-function attemptLogin() {
-  const pw = document.getElementById('login-pw').value;
-  if (pw === _p.join('')) {
-    isOwner = true;
-    sessionStorage.setItem('owner_auth', 'yes');
-    closeLoginModal();
-    updateOwnerUI();
-    renderComments();
-    renderNotes();
-    toast('Welcome back, Gown ✦');
-  } else {
-    const err = document.getElementById('login-error');
-    err.textContent = 'Wrong password. Try again!';
-    document.getElementById('login-pw').value = '';
-    document.getElementById('login-pw').focus();
-    setTimeout(() => { err.textContent = ''; }, 2500);
-  }
-}
-function updateOwnerUI() {
-  const btn = document.getElementById('owner-btn');
-  const lbl = document.getElementById('owner-btn-label');
-  if (isOwner) { btn.classList.add('logged-in'); lbl.textContent = 'Logged in as Gown'; }
-  else { btn.classList.remove('logged-in'); lbl.textContent = 'Owner Login'; }
-}
-document.getElementById('login-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeLoginModal();
-});
+        // --- LIVE DATABASE LISTENER ---
+        if(db) {
+            const q = query(collection(db, "comments"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const feed = document.getElementById('commentsFeed');
+                feed.innerHTML = '';
+                
+                let cooked = 0, uncooked = 0;
 
-// ── UTILS ──
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
-}
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function timeAgo(ts) {
-  const d = Date.now() - new Date(ts).getTime(), s = Math.floor(d/1000);
-  if (s < 60) return 'just now';
-  const m = Math.floor(s/60); if (m < 60) return m+'m ago';
-  const h = Math.floor(m/60); if (h < 24) return h+'h ago';
-  return Math.floor(h/24)+'d ago';
-}
-function initials(n) { return n.trim().split(' ').map(w=>w[0]?.toUpperCase()||'').slice(0,2).join('')||'?'; }
-function avatarGrad(n) {
-  const g=[['#e8c87a','#c45c3b'],['#c45c3b','#7a3a28'],['#4caf82','#2a7a55'],['#7a9ee8','#3a5cc4'],['#e87a9e','#c43b6a'],['#9e7ae8','#6a3ac4']];
-  let h=0; for(let c of n) h=(h*31+c.charCodeAt(0))&0xffff;
-  const [a,b]=g[h%g.length]; return `linear-gradient(135deg,${a},${b})`;
-}
-function spinBtn(id) {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  btn.classList.add('spinning');
-  setTimeout(() => btn.classList.remove('spinning'), 500);
-}
+                snapshot.forEach((doc) => {
+                    const c = doc.data();
+                    
+                    if(c.vote === 'Cooked') cooked++; else uncooked++;
 
-// ── COMMENTS ──
-let comments = [];
-async function loadComments() {
-  const { data, error } = await sb.from('comments').select('*').order('created_at',{ascending:true});
-  if (error) { console.error(error); return; }
-  comments = data || [];
-  renderComments();
-}
-async function refreshComments() {
-  spinBtn('refresh-comments-btn');
-  await loadComments();
-}
-function canEditComment(c) {
-  // owner can do anything; otherwise only if session_id matches
-  return isOwner || c.session_id === sessionId;
-}
-function renderComments() {
-  const el = document.getElementById('comments-list');
-  document.getElementById('stat-comments').textContent = comments.length;
-  if (!comments.length) { el.innerHTML = '<div class="empty-state">No comments yet. Be the first!</div>'; return; }
-  el.innerHTML = comments.map(c => {
-    const isGownName = c.name && (c.name.toLowerCase().includes('gown') || c.name.toLowerCase().includes('sugar') || c.name.toLowerCase().includes('saweedas'));
-    const ownerTag = isGownName ? `<span class="owner-badge">owner</span>` : '';
-    const actions = canEditComment(c)
-      ? `<div class="comment-actions">
-           <button class="comment-action-btn" onclick="editComment('${c.id}')">✎ Edit</button>
-           <button class="comment-action-btn delete" onclick="deleteComment('${c.id}')">✕ Delete</button>
-         </div>`
-      : '';
-    return `
-    <div class="comment-card">
-      <div class="comment-avatar" style="background:${avatarGrad(c.name)}">${initials(c.name)}</div>
-      <div class="comment-body">
-        <div class="comment-meta">
-          <span class="comment-name">${esc(c.name)}</span>${ownerTag}
-          <span class="comment-time">${timeAgo(c.created_at)}</span>
-        </div>
-        <div class="comment-text" id="ct-${c.id}">${esc(c.text)}</div>
-        ${actions}
-      </div>
-    </div>`;
-  }).join('');
-}
-async function submitComment() {
-  const nameInput = document.getElementById('new-comment-name');
-  const textInput = document.getElementById('new-comment-text');
-  const name = isOwner ? 'Gown ✦' : (nameInput.value.trim() || 'Anonymous');
-  const text = textInput.value.trim();
-  if (!text) return toast('Write something first!');
-  const { error } = await sb.from('comments').insert({ name, text, session_id: sessionId });
-  if (error) return toast('Error: ' + error.message);
-  nameInput.value = '';
-  textInput.value = '';
-  toast('Comment posted ✦');
-  await loadComments(); // auto-refresh
-}
-async function deleteComment(id) {
-  const c = comments.find(x => x.id === id);
-  if (!c || !canEditComment(c)) return toast('Not allowed!');
-  const { error } = await sb.from('comments').delete().eq('id', id);
-  if (error) return toast('Error deleting');
-  toast('Comment deleted');
-  // real-time will handle re-render, but also load manually
-  await loadComments();
-}
-function editComment(id) {
-  const c = comments.find(x => x.id === id);
-  if (!c || !canEditComment(c)) return toast('Not allowed!');
-  document.getElementById('ct-'+id).innerHTML = `
-    <textarea class="field-textarea" id="ea-${id}" style="margin-bottom:8px;">${esc(c.text)}</textarea>
-    <button class="btn-primary" onclick="saveComment('${id}')" style="font-size:11px;padding:8px 18px;">Save</button>
-    <button class="btn-ghost" onclick="loadComments()" style="font-size:11px;padding:8px 18px;margin-left:8px;">Cancel</button>`;
-}
-async function saveComment(id) {
-  const c = comments.find(x => x.id === id);
-  if (!c || !canEditComment(c)) return toast('Not allowed!');
-  const val = document.getElementById('ea-'+id)?.value.trim();
-  if (!val) return toast('Cannot be empty');
-  const { error } = await sb.from('comments').update({ text: val }).eq('id', id);
-  if (error) return toast('Error saving');
-  toast('Updated ✦');
-  await loadComments();
-}
-sb.channel('rt-comments')
-  .on('postgres_changes',{event:'*',schema:'public',table:'comments'}, loadComments)
-  .subscribe();
+                    const isSug = c.userCode.toLowerCase() === 'sug';
+                    const badgeColor = c.vote === 'Cooked' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400';
+                    
+                    feed.innerHTML += `
+                        <div class="apple-widget p-5">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="font-bold text-white text-lg tracking-tight">${c.displayName}</span>
+                                    <span class="text-gray-400 text-sm ml-1">(${c.userCode})</span>
+                                    ${isSug ? '<span class="text-yellow-400 ml-1" title="Reserved User">⭐</span>' : ''}
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badgeColor}">
+                                    ${c.vote}
+                                </span>
+                            </div>
+                            <p class="text-gray-200 text-md leading-relaxed mb-4">${c.text}</p>
+                            <div class="flex gap-4 text-xs font-medium text-gray-500">
+                                <span>💻 ${c.device}</span>
+                                <span>🔑 ${c.hwid}</span>
+                            </div>
+                        </div>
+                    `;
+                });
 
-// ── VOTES ──
-let counts = { yes: 0, no: 0 };
-async function loadVotes() {
-  const { data } = await sb.from('votes').select('side');
-  counts = { yes: 0, no: 0 };
-  (data||[]).forEach(v => counts[v.side] = (counts[v.side]||0) + 1);
-  const { data: mine } = await sb.from('votes').select('side').eq('voter_id', voterId).maybeSingle();
-  myVote = mine?.side || null;
-  renderVotes();
-}
-async function castVote(side) {
-  if (myVote === side) {
-    await sb.from('votes').delete().eq('voter_id', voterId);
-    myVote = null; toast('Vote removed');
-  } else {
-    await sb.from('votes').upsert({ voter_id: voterId, side }, { onConflict: 'voter_id' });
-    myVote = side; toast(side === 'yes' ? '🔥 Cooked confirmed' : '💅 You\'re fine');
-  }
-  await loadVotes();
-}
-function renderVotes() {
-  const total = counts.yes + counts.no;
-  document.getElementById('yes-count').textContent = counts.yes;
-  document.getElementById('no-count').textContent = counts.no;
-  const yp = total ? Math.round(counts.yes/total*100) : 0;
-  document.getElementById('yes-pct').textContent = yp;
-  document.getElementById('no-pct').textContent = total ? 100-yp : 0;
-  document.getElementById('vote-bar').style.width = yp + '%';
-  document.getElementById('stat-votes').textContent = total;
-  document.getElementById('stat-verdict').textContent = total === 0 ? '—' : yp > 50 ? 'COOKED 🔥' : yp === 50 ? 'TIE ⚖️' : 'FINE 💅';
-  document.getElementById('vote-yes-btn').classList.toggle('selected', myVote === 'yes');
-  document.getElementById('vote-no-btn').classList.toggle('selected', myVote === 'no');
-}
-sb.channel('rt-votes')
-  .on('postgres_changes',{event:'*',schema:'public',table:'votes'}, loadVotes)
-  .subscribe();
+                if (snapshot.empty) {
+                    feed.innerHTML = '<p class="text-gray-500 text-center py-8">No comments yet. Be the first!</p>';
+                }
 
-// ── NOTES ──
-let notes = [];
-async function loadNotes() {
-  const { data, error } = await sb.from('vote_notes').select('*').order('created_at',{ascending:false});
-  if (error) { console.error(error); return; }
-  notes = data || [];
-  renderNotes();
-}
-async function refreshNotes() {
-  spinBtn('refresh-notes-btn');
-  await loadNotes();
-}
-function canEditNote(n) {
-  return isOwner || n.session_id === sessionId;
-}
-function renderNotes() {
-  const el = document.getElementById('vote-notes-list');
-  if (!notes.length) { el.innerHTML = '<div class="empty-state">No notes yet. Drop your verdict below.</div>'; return; }
-  el.innerHTML = notes.map(n => {
-    const removeBtn = canEditNote(n)
-      ? `· <span class="note-remove" onclick="deleteNote('${n.id}')">remove</span>`
-      : '';
-    return `
-    <div class="vote-note-card">
-      <div class="note-verdict ${n.verdict}">${n.verdict==='yes'?'🔥 COOKED':'💅 NOT COOKED'}</div>
-      <div class="note-body">
-        <div class="note-text">${esc(n.text)}</div>
-        <div class="note-meta">— ${esc(n.name)} ${removeBtn}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-async function submitNote() {
-  const verdict = document.getElementById('note-verdict').value;
-  const name = isOwner ? 'Gown ✦' : (document.getElementById('note-name').value.trim() || 'Anonymous');
-  const text = document.getElementById('note-text').value.trim();
-  if (!verdict) return toast('Pick a verdict!');
-  if (!text) return toast('Write your take!');
-  const { error } = await sb.from('vote_notes').insert({ verdict, name, text, session_id: sessionId });
-  if (error) return toast('Error: ' + error.message);
-  document.getElementById('note-verdict').value = '';
-  document.getElementById('note-name').value = '';
-  document.getElementById('note-text').value = '';
-  toast('Note submitted ✦');
-  await loadNotes(); // auto-refresh
-}
-async function deleteNote(id) {
-  const n = notes.find(x => x.id === id);
-  if (!n || !canEditNote(n)) return toast('Not allowed!');
-  await sb.from('vote_notes').delete().eq('id', id);
-  toast('Note removed');
-  await loadNotes();
-}
-sb.channel('rt-notes')
-  .on('postgres_changes',{event:'*',schema:'public',table:'vote_notes'}, loadNotes)
-  .subscribe();
+                // Update Live Bar
+                let total = cooked + uncooked;
+                let pCooked = total === 0 ? 50 : Math.round((cooked/total)*100);
+                let pUncooked = total === 0 ? 50 : 100 - pCooked;
 
-// sidebar scroll spy
-window.addEventListener('scroll', () => {
-  let cur = 'hero';
-  ['hero','about','comments','vote'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && window.scrollY >= el.offsetTop - 100) cur = id;
-  });
-  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')==='#'+cur));
-});
+                document.getElementById('cookedCount').innerText = total === 0 ? 0 : pCooked;
+                document.getElementById('uncookedCount').innerText = total === 0 ? 0 : pUncooked;
+                document.getElementById('barCooked').style.width = `${pCooked}%`;
+                document.getElementById('barUncooked').style.width = `${pUncooked}%`;
+                document.getElementById('totalVotesText').innerText = `${total} Total Votes Cast`;
+            }, (error) => {
+                console.error("Firestore error (did you enable Test Mode?):", error);
+            });
+        }
 
-document.getElementById('footer-time').textContent =
-  new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+        // --- AUTH & SUBMIT LOGIC ---
+        postBtn.addEventListener('click', () => {
+            const dName = document.getElementById('displayName').value.trim();
+            const text = document.getElementById('commentText').value.trim();
 
-updateOwnerUI();
-loadComments();
-loadVotes();
-loadNotes();
-</script>
+            if (!dName || !text || !currentVote) return alert("Please fill your name, comment, and select a vote!");
+            
+            authModal.classList.remove('hidden');
+            authModal.classList.add('flex');
+        });
+
+        cancelAuth.addEventListener('click', () => {
+            authModal.classList.add('hidden');
+            authModal.classList.remove('flex');
+        });
+
+        confirmAuth.addEventListener('click', async () => {
+            if(!db) return alert("Firebase is not connected. Check your internet or console errors.");
+
+            const uCode = document.getElementById('userCode').value.trim();
+            const uPass = document.getElementById('userPass').value.trim();
+
+            if (uCode.length < 3) return alert("User code must be at least 3 characters!");
+            if (!uPass) return alert("Password required!");
+
+            // SUG protection - The password for 'sug' is 'megumi'. You can change it below if you want!
+            if (uCode.toLowerCase() === 'sug' && uPass !== 'megumi') { 
+                return alert("Incorrect password for reserved user 'sug'.");
+            }
+
+            try {
+                // Check Firebase for user password
+                if (uCode.toLowerCase() !== 'sug') {
+                    const userRef = doc(db, "users", uCode);
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+                        if (userSnap.data().password !== uPass) return alert("Wrong password for this user code!");
+                    } else {
+                        await setDoc(userRef, { password: uPass });
+                    }
+                }
+
+                // Save comment
+                const { device, hwid } = getDeviceAndHWID();
+                await addDoc(collection(db, "comments"), {
+                    displayName: document.getElementById('displayName').value.trim(),
+                    userCode: uCode,
+                    text: document.getElementById('commentText').value.trim(),
+                    vote: currentVote,
+                    device: device,
+                    hwid: hwid,
+                    timestamp: Date.now()
+                });
+                
+                // Cleanup UI
+                authModal.classList.add('hidden');
+                authModal.classList.remove('flex');
+                document.getElementById('commentText').value = '';
+                document.getElementById('userPass').value = ''; 
+                
+            } catch(e) {
+                console.error(e);
+                alert("Error saving! Did you enable Firestore Database in your Firebase Console?");
+            }
+        });
+    </script>
 </body>
 </html>
