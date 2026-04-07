@@ -23,9 +23,9 @@
                 radial-gradient(circle at 85% 30%, rgba(10, 80, 150, 0.3), transparent 40%);
             background-attachment: fixed;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Liquid Glass effect */
         .apple-glass {
             background: rgba(30, 30, 32, 0.45);
             backdrop-filter: blur(40px) saturate(200%);
@@ -43,7 +43,6 @@
             transition: transform 0.2s ease;
         }
 
-        /* iOS style inputs */
         .apple-input {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -60,7 +59,6 @@
             box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.2);
         }
 
-        /* Apple Buttons */
         .apple-btn {
             background: var(--apple-blue);
             color: white;
@@ -73,9 +71,6 @@
         }
         .apple-btn:active { transform: scale(0.96); opacity: 0.8; }
         
-        .apple-btn-red { background: var(--apple-red); }
-
-        /* iOS Segmented Control for Voting */
         .segmented-control {
             display: flex;
             background: rgba(255, 255, 255, 0.1);
@@ -94,32 +89,82 @@
         .segment.selected-cooked { background: var(--apple-red); color: white; box-shadow: 0 2px 8px rgba(255, 69, 58, 0.4); }
         .segment.selected-uncooked { background: var(--apple-blue); color: white; box-shadow: 0 2px 8px rgba(10, 132, 255, 0.4); }
 
-        /* Live Bar */
         .live-bar-container { height: 16px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; display: flex; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
         .bar-cooked { background: linear-gradient(90deg, #ff3b30, #ff453a); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .bar-uncooked { background: linear-gradient(90deg, #007aff, #0a84ff); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Hidden Scrollbar */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .hero-title { font-weight: 800; letter-spacing: -0.04em; }
         .section-title { font-weight: 700; letter-spacing: -0.02em; color: rgba(255,255,255,0.9); }
+
+        /* Sidebar Transition */
+        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="p-6 md:p-12 antialiased relative">
 
-    <!-- Top Navigation / User Profile -->
-    <div id="userNav" class="hidden absolute top-6 right-6 md:top-8 md:right-12 flex items-center gap-4 bg-white/5 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md">
-        <div class="text-sm">
-            <span class="text-gray-400">Logged in as:</span>
-            <span id="navUserName" class="font-bold text-white ml-1"></span>
+    <!-- Profile Button (Top Right) -->
+    <div id="profileBtn" class="hidden fixed top-6 right-6 md:top-8 md:right-12 flex items-center gap-3 bg-white/10 border border-white/20 px-5 py-2.5 rounded-full backdrop-blur-xl cursor-pointer hover:bg-white/20 transition z-40 shadow-lg">
+        <div class="text-sm font-medium">
+            <span id="navUserName" class="text-white"></span>
         </div>
-        <button id="logoutBtn" class="text-xs font-bold text-red-400 hover:text-red-300 transition uppercase tracking-wider">Log Out</button>
+        <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">👤</div>
+    </div>
+
+    <!-- macOS Control Center Sidebar -->
+    <div id="sidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-black/50 backdrop-blur-3xl border-l border-white/10 z-50 transform translate-x-full shadow-2xl p-8 flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold tracking-tight">Account</h2>
+            <button id="closeSidebar" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        </div>
+
+        <div class="flex-1 space-y-6">
+            <!-- User Info Readonly -->
+            <div>
+                <p class="text-xs text-gray-500 uppercase font-bold mb-1">User Code (Unchangeable)</p>
+                <div id="sideUserCode" class="apple-input bg-white/5 text-gray-400 cursor-not-allowed"></div>
+            </div>
+
+            <!-- Update Display Name & Password -->
+            <div>
+                <p class="text-xs text-gray-500 uppercase font-bold mb-1">Display Name</p>
+                <input type="text" id="editName" class="apple-input" placeholder="New Display Name">
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 uppercase font-bold mb-1">New Password</p>
+                <input type="password" id="editPass" class="apple-input" placeholder="Leave blank to keep current">
+            </div>
+
+            <button id="saveProfileBtn" class="apple-btn w-full bg-white text-black hover:bg-gray-200">Save Changes</button>
+
+            <!-- Admin Panel Button (Hidden by default) -->
+            <button id="openAdminBtn" class="hidden apple-btn w-full !bg-purple-600 hover:!bg-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.5)] mt-8">👑 Open Admin Panel</button>
+        </div>
+
+        <button id="logoutBtn" class="w-full py-3 rounded-xl border border-red-500/30 text-red-400 font-bold hover:bg-red-500/10 transition mt-auto">Log Out</button>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="apple-glass w-full max-w-2xl max-h-[80vh] flex flex-col p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold tracking-tight text-purple-400">👑 Admin Dashboard</h2>
+                <button id="closeAdminModal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            
+            <p class="text-sm text-gray-400 mb-4">Grant or revoke stars for accounts. Stars apply to all their past and future comments.</p>
+            
+            <!-- User List -->
+            <div id="adminUserList" class="flex-1 overflow-y-auto hide-scrollbar space-y-3 pr-2">
+                <!-- Users populate here -->
+            </div>
+        </div>
     </div>
 
     <!-- Hero Section -->
-    <header class="max-w-4xl mx-auto text-center mt-12 mb-16">
+    <header class="max-w-4xl mx-auto text-center mt-20 mb-16 px-4">
         <h1 class="hero-title text-5xl md:text-7xl mb-2 text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500">
             Saweedas Khanteetaow
         </h1>
@@ -132,33 +177,8 @@
         </div>
     </header>
 
-    <!-- About Section -->
-    <section class="max-w-4xl mx-auto mb-16">
-        <h2 class="section-title text-2xl mb-6 ml-2">§ 01 — About</h2>
-        <p class="text-gray-400 mb-8 max-w-xl ml-2">
-            A BIT ABOUT ME. im pretty dang uncreative dude, and like, i only know how to code in luau, i make ai put the functionality in it.... i actually have potential but im too fkn lazy to actually reach my full potential, megumi in a nutshell.
-        </p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="apple-widget p-6 hover:scale-105 transition-transform">
-                <div class="text-3xl mb-4">🎨</div>
-                <h3 class="font-bold text-lg mb-2">Visual Design</h3>
-                <p class="text-gray-400 text-sm">UI/UX is pretty good fr</p>
-            </div>
-            <div class="apple-widget p-6 hover:scale-105 transition-transform">
-                <div class="text-3xl mb-4">⚡</div>
-                <h3 class="font-bold text-lg mb-2">Luau/Lua</h3>
-                <p class="text-gray-400 text-sm">Exclusive to Python yes yummers</p>
-            </div>
-            <div class="apple-widget p-6 hover:scale-105 transition-transform">
-                <div class="text-3xl mb-4">🌙</div>
-                <h3 class="font-bold text-lg mb-2">Deep Sleeper</h3>
-                <p class="text-gray-400 text-sm">mrrp meow</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="max-w-4xl mx-auto space-y-8 mb-20">
+    <!-- Content Sections -->
+    <section class="max-w-4xl mx-auto space-y-8 mb-20 px-4">
         
         <!-- CARD 1: The Fused Voting Section -->
         <div class="apple-glass p-8 border-t-4 border-t-blue-500">
@@ -176,7 +196,6 @@
 
             <hr class="border-gray-700/50 my-8">
 
-            <!-- Overall Verdict (Live Bar) -->
             <h2 class="section-title text-xl mb-4">Overall Verdict</h2>
             <div class="flex justify-between text-sm font-semibold mb-3">
                 <span class="text-red-400">Cooked (<span id="cookedCount">0</span>%)</span>
@@ -199,7 +218,6 @@
                 </div>
             </div>
 
-            <!-- Scrollable Community Feed -->
             <h2 class="section-title text-xl mb-4">Community Feed</h2>
             <div id="commentsFeed" class="space-y-4 max-h-[500px] overflow-y-auto hide-scrollbar pb-4 px-1">
                 <!-- Comments load here -->
@@ -208,9 +226,9 @@
 
     </section>
 
-    <!-- macOS Style Auth Modal (Forced on visit) -->
-    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl">
-        <div class="apple-glass p-8 w-full max-w-sm text-center transform scale-100 transition-all">
+    <!-- Auth Modal (Forced on visit) -->
+    <div id="authModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl">
+        <div class="apple-glass p-8 w-full max-w-sm text-center">
             <h3 class="text-2xl font-bold mb-2 tracking-tight">Welcome</h3>
             <p class="text-sm text-gray-400 mb-6">Create an account or log back in to continue.</p>
             
@@ -221,14 +239,13 @@
             </div>
             
             <button id="confirmAuth" class="apple-btn w-full text-lg py-3">Enter Site</button>
-            <p class="text-xs text-gray-500 mt-4">Your session will be saved automatically.</p>
         </div>
     </div>
 
     <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD6ciclM7NFpDx-J4YYyirGmFr9lddsJFw",
@@ -243,39 +260,79 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- STATE & AUTH ---
+        // --- STATE ---
         let currentUser = JSON.parse(localStorage.getItem('castavote_session'));
         let selectedVote = null;
+        let globalUsers = {}; // Stores all user data for stars & admin panel
+        let allComments = []; // Local cache of comments
 
+        // DOM Elements
         const authModal = document.getElementById('authModal');
-        const userNav = document.getElementById('userNav');
-        const navUserName = document.getElementById('navUserName');
-        const voteSegments = document.querySelectorAll('.segment');
+        const profileBtn = document.getElementById('profileBtn');
+        const sidebar = document.getElementById('sidebar');
+        const adminModal = document.getElementById('adminModal');
 
         // Check login on visit
         function checkAuth() {
             if (currentUser) {
                 authModal.classList.add('hidden');
-                userNav.classList.remove('hidden');
-                userNav.classList.add('flex');
-                navUserName.innerText = `${currentUser.displayName} (${currentUser.userCode})`;
+                profileBtn.classList.remove('hidden');
                 
-                // Show star if sug
+                // Set sidebar data
+                document.getElementById('navUserName').innerText = currentUser.displayName;
+                document.getElementById('sideUserCode').innerText = currentUser.userCode;
+                document.getElementById('editName').value = currentUser.displayName;
+
+                // Show admin button if sug
                 if(currentUser.userCode.toLowerCase() === 'sug') {
-                    navUserName.innerHTML += ' <span class="text-yellow-400">⭐</span>';
+                    document.getElementById('openAdminBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('openAdminBtn').classList.add('hidden');
                 }
             } else {
                 authModal.classList.remove('hidden');
-                authModal.classList.add('flex');
-                userNav.classList.add('hidden');
-                userNav.classList.remove('flex');
+                profileBtn.classList.add('hidden');
+                sidebar.classList.add('translate-x-full');
             }
         }
         checkAuth();
 
-        // Login / Signup Function
+        // --- SIDEBAR LOGIC ---
+        profileBtn.addEventListener('click', () => sidebar.classList.remove('translate-x-full'));
+        document.getElementById('closeSidebar').addEventListener('click', () => sidebar.classList.add('translate-x-full'));
+
+        document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+            const newName = document.getElementById('editName').value.trim();
+            const newPass = document.getElementById('editPass').value.trim();
+            if (!newName) return alert("Display name cannot be empty!");
+
+            try {
+                let updates = { displayName: newName };
+                if (newPass) updates.password = newPass;
+
+                await updateDoc(doc(db, "users", currentUser.userCode), updates);
+                
+                currentUser.displayName = newName;
+                localStorage.setItem('castavote_session', JSON.stringify(currentUser));
+                document.getElementById('navUserName').innerText = newName;
+                document.getElementById('editPass').value = ''; // clear password field
+                alert("Profile updated!");
+            } catch(e) {
+                console.error(e);
+                alert("Error saving profile");
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('castavote_session');
+            currentUser = null;
+            checkAuth();
+        });
+
+        // --- AUTH (Login / Signup) ---
         document.getElementById('confirmAuth').addEventListener('click', async () => {
-            const uCode = document.getElementById('authCode').value.trim();
+            const uCode = document.getElementById('authCode').value.trim().toLowerCase();
             const uName = document.getElementById('authName').value.trim();
             const uPass = document.getElementById('authPass').value.trim();
 
@@ -283,49 +340,87 @@
             if (!uName) return alert("Please enter a Display Name!");
             if (!uPass) return alert("Password is required!");
 
-            // SUG protection 
-            if (uCode.toLowerCase() === 'sug' && uPass !== 'megumi') { 
-                return alert("Incorrect password for reserved user 'sug'.");
-            }
-
             try {
-                const userRef = doc(db, "users", uCode.toLowerCase());
+                const userRef = doc(db, "users", uCode);
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
-                    // Logging in
-                    if (userSnap.data().password !== uPass) {
-                        return alert("Wrong password for this User Code!");
-                    }
-                    // Update display name if they changed it
-                    await setDoc(userRef, { password: uPass, displayName: uName }, { merge: true });
+                    if (userSnap.data().password !== uPass) return alert("Wrong password for this User Code!");
+                    await updateDoc(userRef, { displayName: uName });
                 } else {
-                    // Creating account
-                    await setDoc(userRef, { password: uPass, displayName: uName });
+                    // Create account. If they are "sug", they get the star automatically!
+                    let isStarred = uCode === 'sug'; 
+                    await setDoc(userRef, { password: uPass, displayName: uName, isStarred: isStarred });
                 }
 
-                // Save session
                 currentUser = { userCode: uCode, displayName: uName };
                 localStorage.setItem('castavote_session', JSON.stringify(currentUser));
                 
-                // Clear inputs & hide modal
                 document.getElementById('authPass').value = '';
                 checkAuth();
+                buildCommentsFeed(); // re-render feed
 
-            } catch(e) {
-                console.error(e);
-                alert("Error connecting to database.");
+            } catch(e) { console.error(e); alert("Error connecting to database."); }
+        });
+
+        // --- ADMIN PANEL ---
+        document.getElementById('openAdminBtn').addEventListener('click', () => {
+            sidebar.classList.add('translate-x-full');
+            adminModal.classList.remove('hidden');
+            adminModal.classList.add('flex');
+            buildAdminUserList();
+        });
+
+        document.getElementById('closeAdminModal').addEventListener('click', () => {
+            adminModal.classList.add('hidden');
+            adminModal.classList.remove('flex');
+        });
+
+        // Fetch Users (For Stars & Admin)
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            globalUsers = {};
+            snapshot.forEach(doc => {
+                globalUsers[doc.id] = doc.data();
+            });
+            buildCommentsFeed(); // Update stars dynamically in chat
+            if (!adminModal.classList.contains('hidden')) buildAdminUserList();
+        });
+
+        function buildAdminUserList() {
+            const list = document.getElementById('adminUserList');
+            list.innerHTML = '';
+            
+            Object.keys(globalUsers).forEach(code => {
+                if(code === 'sug') return; // Cannot edit main admin
+                const u = globalUsers[code];
+                const hasStar = u.isStarred;
+
+                list.innerHTML += `
+                    <div class="bg-white/5 border border-white/10 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-white">${u.displayName} <span class="text-sm text-gray-400 font-normal">(${code})</span></p>
+                        </div>
+                        <button onclick="window.toggleStar('${code}', ${!hasStar})" class="px-4 py-2 rounded-full text-xs font-bold transition ${hasStar ? 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30' : 'bg-white/10 text-white hover:bg-white/20'}">
+                            ${hasStar ? '⭐ Remove Star' : 'Grant ⭐'}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // Global function for the inline onclick handler
+        window.toggleStar = async (code, setStar) => {
+            await updateDoc(doc(db, "users", code), { isStarred: setStar });
+        };
+
+        window.deleteComment = async (commentId) => {
+            if(confirm("Are you sure you want to delete this comment?")) {
+                await deleteDoc(doc(db, "comments", commentId));
             }
-        });
+        };
 
-        // Logout Function
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('castavote_session');
-            currentUser = null;
-            checkAuth();
-        });
 
-        // --- HWID & DEVICE GENERATOR ---
+        // --- HWID GENERATOR ---
         function getDeviceAndHWID() {
             const ua = navigator.userAgent;
             let device = "Desktop";
@@ -335,52 +430,32 @@
             else if (/Windows/.test(ua)) device = "Windows";
 
             let hwid = localStorage.getItem('castavote_hwid');
-            if (!hwid) {
-                hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-                localStorage.setItem('castavote_hwid', hwid);
-            }
+            if (!hwid) { hwid = 'HWID-' + Math.random().toString(36).substring(2, 10).toUpperCase(); localStorage.setItem('castavote_hwid', hwid); }
             return { device, hwid };
         }
 
-        // --- VOTING SYSTEM (Fused Card) ---
+        // --- VOTING SYSTEM ---
+        const voteSegments = document.querySelectorAll('.segment');
         voteSegments.forEach(seg => {
             seg.addEventListener('click', () => {
                 voteSegments.forEach(s => s.className = 'segment');
-                if (seg.dataset.vote === 'cooked') {
-                    seg.classList.add('selected-cooked');
-                    selectedVote = 'Cooked';
-                } else {
-                    seg.classList.add('selected-uncooked');
-                    selectedVote = 'Not Cooked';
-                }
+                if (seg.dataset.vote === 'cooked') { seg.classList.add('selected-cooked'); selectedVote = 'Cooked'; } 
+                else { seg.classList.add('selected-uncooked'); selectedVote = 'Not Cooked'; }
             });
         });
 
         document.getElementById('submitVoteBtn').addEventListener('click', async () => {
             if (!selectedVote) return alert("Select Cooked or Not Cooked first!");
             if (!currentUser) return alert("You must be logged in!");
-
             try {
-                // Save vote specifically tied to userCode (so they can only have 1 active vote)
-                await setDoc(doc(db, "votes", currentUser.userCode.toLowerCase()), {
-                    vote: selectedVote,
-                    timestamp: Date.now()
-                });
+                await setDoc(doc(db, "votes", currentUser.userCode), { vote: selectedVote, timestamp: Date.now() });
                 alert("Vote locked in successfully!");
-            } catch(e) {
-                console.error(e);
-                alert("Error saving vote!");
-            }
+            } catch(e) { console.error(e); alert("Error saving vote!"); }
         });
 
-        // Listen to Live Votes
         onSnapshot(collection(db, "votes"), (snapshot) => {
             let cooked = 0, uncooked = 0;
-            snapshot.forEach((doc) => {
-                if(doc.data().vote === 'Cooked') cooked++;
-                else uncooked++;
-            });
-
+            snapshot.forEach((doc) => { if(doc.data().vote === 'Cooked') cooked++; else uncooked++; });
             let total = cooked + uncooked;
             let pCooked = total === 0 ? 50 : Math.round((cooked/total)*100);
             let pUncooked = total === 0 ? 50 : 100 - pCooked;
@@ -392,50 +467,53 @@
             document.getElementById('totalVotesText').innerText = `${total} Total Votes Cast`;
         });
 
-        // --- COMMENT SYSTEM (Separate Card) ---
+        // --- COMMENT SYSTEM ---
         document.getElementById('postCommentBtn').addEventListener('click', async () => {
             const text = document.getElementById('commentText').value.trim();
-            if (!text) return alert("Write a comment first!");
-            if (!currentUser) return alert("You must be logged in!");
-
+            if (!text || !currentUser) return;
             try {
                 const { device, hwid } = getDeviceAndHWID();
                 await addDoc(collection(db, "comments"), {
-                    displayName: currentUser.displayName,
                     userCode: currentUser.userCode,
                     text: text,
                     device: device,
                     hwid: hwid,
                     timestamp: Date.now()
                 });
-                
                 document.getElementById('commentText').value = '';
-            } catch(e) {
-                console.error(e);
-                alert("Error saving comment!");
-            }
+            } catch(e) { console.error(e); }
         });
 
-        // Listen to Live Comments
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
         onSnapshot(qComments, (snapshot) => {
+            allComments = [];
+            snapshot.forEach(doc => { allComments.push({ id: doc.id, ...doc.data() }); });
+            buildCommentsFeed();
+        });
+
+        function buildCommentsFeed() {
             const feed = document.getElementById('commentsFeed');
             feed.innerHTML = '';
+            const isAdmin = currentUser && currentUser.userCode.toLowerCase() === 'sug';
 
-            snapshot.forEach((doc) => {
-                const c = doc.data();
-                const isSug = c.userCode.toLowerCase() === 'sug';
-                
+            allComments.forEach(c => {
+                const uData = globalUsers[c.userCode.toLowerCase()] || {};
+                // Fallback to comment payload displayname if user deleted, otherwise use live Display Name
+                const liveName = uData.displayName || "Unknown User"; 
+                const isStarred = uData.isStarred || c.userCode.toLowerCase() === 'sug';
+
                 feed.innerHTML += `
-                    <div class="apple-widget p-5">
+                    <div class="apple-widget p-5 relative group">
+                        ${isAdmin ? `<button onclick="window.deleteComment('${c.id}')" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition opacity-0 group-hover:opacity-100" title="Delete Comment">🗑️</button>` : ''}
+                        
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <span class="font-bold text-white text-lg tracking-tight">${c.displayName}</span>
+                                <span class="font-bold text-white text-lg tracking-tight">${liveName}</span>
                                 <span class="text-gray-400 text-sm ml-1">(${c.userCode})</span>
-                                ${isSug ? '<span class="text-yellow-400 ml-1" title="Reserved User">⭐</span>' : ''}
+                                ${isStarred ? '<span class="text-yellow-400 ml-1 text-sm shadow-yellow-500/50" title="Verified User">⭐</span>' : ''}
                             </div>
                         </div>
-                        <p class="text-gray-200 text-md leading-relaxed mb-4">${c.text}</p>
+                        <p class="text-gray-200 text-md leading-relaxed mb-4 pr-6">${c.text}</p>
                         <div class="flex gap-4 text-xs font-medium text-gray-500">
                             <span>💻 ${c.device}</span>
                             <span>🔑 ${c.hwid}</span>
@@ -444,10 +522,8 @@
                 `;
             });
 
-            if (snapshot.empty) {
-                feed.innerHTML = '<p class="text-gray-500 text-center py-8">No comments yet. Be the first!</p>';
-            }
-        });
+            if (allComments.length === 0) feed.innerHTML = '<p class="text-gray-500 text-center py-8">No comments yet. Be the first!</p>';
+        }
 
     </script>
 </body>
